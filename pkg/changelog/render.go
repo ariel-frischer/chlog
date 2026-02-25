@@ -7,20 +7,30 @@ import (
 	"unicode"
 )
 
+// RenderOptions controls markdown rendering behavior.
+type RenderOptions struct {
+	IncludeInternal bool
+	Config          *Config
+}
+
 // RenderMarkdown writes a full Keep a Changelog-compliant markdown document.
-func RenderMarkdown(c *Changelog, w io.Writer) error {
+func RenderMarkdown(c *Changelog, w io.Writer, opts ...RenderOptions) error {
+	var opt RenderOptions
+	if len(opts) > 0 {
+		opt = opts[0]
+	}
+
 	fmt.Fprintf(w, "# Changelog\n\n")
 	fmt.Fprintf(w, "All notable changes to %s will be documented in this file.\n\n", c.Project)
 	fmt.Fprintf(w, "The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).\n\n")
 
 	for _, v := range c.Versions {
-		if err := RenderVersionMarkdown(&v, w); err != nil {
+		if err := RenderVersionMarkdown(&v, w, opt); err != nil {
 			return err
 		}
 	}
 
-	repoURL, err := DetectRepoURL()
-	if err == nil && repoURL != "" {
+	if repoURL := ResolveRepoURL(opt.Config); repoURL != "" {
 		renderComparisonLinks(c, w, repoURL)
 	}
 
@@ -28,24 +38,34 @@ func RenderMarkdown(c *Changelog, w io.Writer) error {
 }
 
 // RenderMarkdownString renders the changelog to a string.
-func RenderMarkdownString(c *Changelog) (string, error) {
+func RenderMarkdownString(c *Changelog, opts ...RenderOptions) (string, error) {
 	var b strings.Builder
-	if err := RenderMarkdown(c, &b); err != nil {
+	if err := RenderMarkdown(c, &b, opts...); err != nil {
 		return "", err
 	}
 	return b.String(), nil
 }
 
 // RenderVersionMarkdown writes a single version as markdown.
-func RenderVersionMarkdown(v *Version, w io.Writer) error {
+func RenderVersionMarkdown(v *Version, w io.Writer, opts ...RenderOptions) error {
+	var opt RenderOptions
+	if len(opts) > 0 {
+		opt = opts[0]
+	}
+
 	if v.IsUnreleased() {
 		fmt.Fprintf(w, "## [Unreleased]\n\n")
 	} else {
 		fmt.Fprintf(w, "## [%s] - %s\n\n", v.Version, v.Date)
 	}
 
+	changes := v.Changes
+	if opt.IncludeInternal {
+		changes = v.MergedChanges()
+	}
+
 	for _, cat := range ValidCategories() {
-		entries := v.Changes.CategoryEntries(cat)
+		entries := changes.CategoryEntries(cat)
 		if len(entries) == 0 {
 			continue
 		}

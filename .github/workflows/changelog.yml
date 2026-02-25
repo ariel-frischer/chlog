@@ -1,0 +1,25 @@
+name: Changelog Check
+
+on:
+  pull_request:
+    paths:
+      - "CHANGELOG.yaml"
+      - "CHANGELOG.md"
+
+jobs:
+  changelog-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - run: go install gitlab.com/ariel-frischer/chlog@latest
+
+      - name: Validate CHANGELOG.yaml
+        run: chlog validate
+
+      - name: Verify CHANGELOG.md is in sync
+        run: chlog check

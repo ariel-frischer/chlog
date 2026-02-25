@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/spf13/cobra"
+	"gitlab.com/ariel-frischer/chlog/pkg/changelog"
 )
 
 const (
@@ -9,7 +10,10 @@ const (
 	defaultMDFile   = "CHANGELOG.md"
 )
 
-var yamlFile string
+var (
+	yamlFile   string
+	configFile string
+)
 
 var rootCmd = &cobra.Command{
 	Use:     "chlog",
@@ -20,6 +24,7 @@ var rootCmd = &cobra.Command{
 
 func init() {
 	rootCmd.PersistentFlags().StringVarP(&yamlFile, "file", "f", defaultYAMLFile, "path to CHANGELOG.yaml")
+	rootCmd.PersistentFlags().StringVar(&configFile, "config", changelog.DefaultConfigFile, "path to config file")
 
 	rootCmd.AddCommand(initCmd)
 	rootCmd.AddCommand(syncCmd)
@@ -28,4 +33,13 @@ func init() {
 	rootCmd.AddCommand(extractCmd)
 	rootCmd.AddCommand(showCmd)
 	rootCmd.AddCommand(scaffoldCmd)
+	rootCmd.AddCommand(releaseCmd)
+}
+
+func loadConfig() *changelog.Config {
+	cfg, err := changelog.LoadConfig(configFile)
+	if err != nil {
+		return &changelog.Config{}
+	}
+	return cfg
 }

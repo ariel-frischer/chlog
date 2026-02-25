@@ -50,3 +50,37 @@ versions:
 ```
 
 Six categories from [Keep a Changelog](https://keepachangelog.com/): `added`, `changed`, `deprecated`, `removed`, `fixed`, `security`.
+
+## CI
+
+Add `.github/workflows/changelog.yml` to validate your changelog on PRs:
+
+```yaml
+name: Changelog Check
+
+on:
+  pull_request:
+    paths:
+      - "CHANGELOG.yaml"
+      - "CHANGELOG.md"
+
+jobs:
+  changelog-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - run: go install gitlab.com/ariel-frischer/chlog@latest
+
+      - name: Validate CHANGELOG.yaml
+        run: chlog validate
+
+      - name: Verify CHANGELOG.md is in sync
+        run: chlog check
+```
+
+Exit codes: `0` = in sync, `1` = out of sync, `2` = validation error.

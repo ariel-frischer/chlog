@@ -42,7 +42,7 @@ func runScaffold(cmd *cobra.Command, args []string) error {
 	}
 
 	v := changelog.Scaffold(commits, changelog.ScaffoldOptions{Version: scaffoldVersion})
-	if v.Changes.IsEmpty() {
+	if v.Changes.IsEmpty() && v.Internal.IsEmpty() {
 		fmt.Println("No conventional commits found")
 		return nil
 	}
@@ -71,6 +71,7 @@ func writeScaffold(v *changelog.Version) error {
 	existing := c.GetUnreleased()
 	if existing != nil && v.Version == "unreleased" {
 		mergeChanges(&existing.Changes, &v.Changes)
+		mergeChanges(&existing.Internal, &v.Internal)
 	} else {
 		c.Versions = append([]changelog.Version{*v}, c.Versions...)
 	}
@@ -79,7 +80,7 @@ func writeScaffold(v *changelog.Version) error {
 		return fmt.Errorf("saving %s: %w", yamlFile, err)
 	}
 
-	fmt.Printf("Updated %s with %d entries\n", yamlFile, v.Changes.Count())
+	fmt.Printf("Updated %s with %d entries\n", yamlFile, v.Changes.Count()+v.Internal.Count())
 	return nil
 }
 

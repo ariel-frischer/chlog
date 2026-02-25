@@ -8,6 +8,7 @@ func TestParseConventionalCommit(t *testing.T) {
 		wantCat      string
 		wantDesc     string
 		wantBreaking bool
+		wantInternal bool
 	}{
 		"feat": {
 			subject:  "feat: add user authentication",
@@ -20,14 +21,16 @@ func TestParseConventionalCommit(t *testing.T) {
 			wantDesc: "Resolve login redirect",
 		},
 		"refactor": {
-			subject:  "refactor: simplify auth middleware",
-			wantCat:  "changed",
-			wantDesc: "Simplify auth middleware",
+			subject:      "refactor: simplify auth middleware",
+			wantCat:      "changed",
+			wantDesc:     "Simplify auth middleware",
+			wantInternal: true,
 		},
 		"perf": {
-			subject:  "perf: optimize database queries",
-			wantCat:  "changed",
-			wantDesc: "Optimize database queries",
+			subject:      "perf: optimize database queries",
+			wantCat:      "changed",
+			wantDesc:     "Optimize database queries",
+			wantInternal: true,
 		},
 		"deprecate": {
 			subject:  "deprecate: old API endpoint",
@@ -98,7 +101,7 @@ func TestParseConventionalCommit(t *testing.T) {
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			cat, desc, breaking := ParseConventionalCommit(tc.subject)
+			cat, desc, breaking, internal := ParseConventionalCommit(tc.subject)
 			if cat != tc.wantCat {
 				t.Errorf("category = %q, want %q", cat, tc.wantCat)
 			}
@@ -107,6 +110,9 @@ func TestParseConventionalCommit(t *testing.T) {
 			}
 			if breaking != tc.wantBreaking {
 				t.Errorf("breaking = %v, want %v", breaking, tc.wantBreaking)
+			}
+			if internal != tc.wantInternal {
+				t.Errorf("internal = %v, want %v", internal, tc.wantInternal)
 			}
 		})
 	}

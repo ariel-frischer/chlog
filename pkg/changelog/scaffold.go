@@ -25,17 +25,23 @@ var commitTypeMap = map[string]string{
 	"remove":    "removed",
 }
 
+// internalTypes are commit types routed to internal changes by default.
+var internalTypes = map[string]bool{
+	"refactor": true,
+	"perf":     true,
+}
+
 // skippedTypes are commit types that don't belong in changelogs.
 var skippedTypes = map[string]bool{
 	"chore": true, "docs": true, "style": true,
 	"test": true, "ci": true, "build": true,
 }
 
-// ParseConventionalCommit extracts category, description, and breaking flag from a commit subject.
-func ParseConventionalCommit(subject string) (category, description string, breaking bool) {
+// ParseConventionalCommit extracts category, description, breaking flag, and internal flag from a commit subject.
+func ParseConventionalCommit(subject string) (category, description string, breaking, internal bool) {
 	m := conventionalPattern.FindStringSubmatch(subject)
 	if m == nil {
-		return "", "", false
+		return "", "", false, false
 	}
 
 	commitType := strings.ToLower(m[1])
@@ -43,20 +49,23 @@ func ParseConventionalCommit(subject string) (category, description string, brea
 	description = cleanDescription(m[3])
 
 	if skippedTypes[commitType] && !breaking {
-		return "", "", false
+		return "", "", false, false
 	}
 
 	category = commitTypeMap[commitType]
 	if category == "" && !breaking {
-		return "", "", false
+		return "", "", false, false
 	}
+
+	internal = internalTypes[commitType]
 
 	if breaking {
 		category = "changed"
 		description = "BREAKING: " + description
+		internal = false
 	}
 
-	return category, description, breaking
+	return category, description, breaking, internal
 }
 
 // Scaffold creates a Version from a list of git commits.
@@ -69,11 +78,15 @@ func Scaffold(commits []GitCommit, opts ScaffoldOptions) *Version {
 	v := &Version{Version: version}
 
 	for _, c := range commits {
-		cat, desc, _ := ParseConventionalCommit(c.Subject)
+		cat, desc, _, isInternal := ParseConventionalCommit(c.Subject)
 		if cat == "" {
 			continue
 		}
-		appendToCategory(&v.Changes, cat, desc)
+		if isInternal {
+			appendToCategory(&v.Internal, cat, desc)
+		} else {
+			appendToCategory(&v.Changes, cat, desc)
+		}
 	}
 
 	return v

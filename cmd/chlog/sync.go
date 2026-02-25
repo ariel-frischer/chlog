@@ -9,10 +9,16 @@ import (
 	"gitlab.com/ariel-frischer/chlog/pkg/changelog"
 )
 
+var syncInternal bool
+
 var syncCmd = &cobra.Command{
 	Use:   "sync",
 	Short: "Generate CHANGELOG.md from CHANGELOG.yaml",
 	RunE:  runSync,
+}
+
+func init() {
+	syncCmd.Flags().BoolVar(&syncInternal, "internal", false, "include internal entries")
 }
 
 func runSync(cmd *cobra.Command, args []string) error {
@@ -21,7 +27,10 @@ func runSync(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	rendered, err := changelog.RenderMarkdownString(c)
+	rendered, err := changelog.RenderMarkdownString(c, changelog.RenderOptions{
+		IncludeInternal: syncInternal,
+		Config:          loadConfig(),
+	})
 	if err != nil {
 		return fmt.Errorf("rendering markdown: %w", err)
 	}

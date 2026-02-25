@@ -90,7 +90,7 @@ func Validate(c *Changelog) []ValidationError {
 			}
 		}
 
-		if v.Changes.IsEmpty() {
+		if v.Changes.IsEmpty() && v.Internal.IsEmpty() {
 			errs = append(errs, ValidationError{
 				Field:   prefix + ".changes",
 				Message: "must have at least one entry",
@@ -102,6 +102,14 @@ func Validate(c *Changelog) []ValidationError {
 				if strings.TrimSpace(entry) == "" {
 					errs = append(errs, ValidationError{
 						Field:   fmt.Sprintf("%s.changes.%s[%d]", prefix, cat, j),
+						Message: "entry must not be empty",
+					})
+				}
+			}
+			for j, entry := range v.Internal.CategoryEntries(cat) {
+				if strings.TrimSpace(entry) == "" {
+					errs = append(errs, ValidationError{
+						Field:   fmt.Sprintf("%s.internal.%s[%d]", prefix, cat, j),
 						Message: "entry must not be empty",
 					})
 				}

@@ -16,8 +16,9 @@ type CategoryStyle struct {
 
 // FormatOptions controls terminal output formatting.
 type FormatOptions struct {
-	Plain    bool
-	MaxWidth int
+	Plain           bool
+	MaxWidth        int
+	IncludeInternal bool
 }
 
 var categoryStyles = map[string]CategoryStyle{
@@ -76,8 +77,13 @@ func FormatVersion(v *Version, opts FormatOptions) string {
 		fmt.Fprintf(&b, "%s\n", bold.Sprint(header))
 	}
 
+	changes := v.Changes
+	if opts.IncludeInternal {
+		changes = v.MergedChanges()
+	}
+
 	for _, cat := range ValidCategories() {
-		entries := v.Changes.CategoryEntries(cat)
+		entries := changes.CategoryEntries(cat)
 		if len(entries) == 0 {
 			continue
 		}

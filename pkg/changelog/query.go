@@ -40,9 +40,14 @@ func (c *Changelog) ListVersions() []string {
 	return versions
 }
 
+// QueryOptions controls which entries are included in query results.
+type QueryOptions struct {
+	IncludeInternal bool
+}
+
 // GetLastN returns the first n entries across all versions, newest first.
-func (c *Changelog) GetLastN(n int) []Entry {
-	all := c.AllEntries()
+func (c *Changelog) GetLastN(n int, opts ...QueryOptions) []Entry {
+	all := c.AllEntries(opts...)
 	if n >= len(all) {
 		return all
 	}
@@ -50,10 +55,14 @@ func (c *Changelog) GetLastN(n int) []Entry {
 }
 
 // AllEntries returns all entries flattened across all versions, newest first.
-func (c *Changelog) AllEntries() []Entry {
+func (c *Changelog) AllEntries(opts ...QueryOptions) []Entry {
+	var opt QueryOptions
+	if len(opts) > 0 {
+		opt = opts[0]
+	}
 	var entries []Entry
 	for _, v := range c.Versions {
-		entries = append(entries, flattenChanges(&v)...)
+		entries = append(entries, flattenChanges(&v, opt.IncludeInternal)...)
 	}
 	return entries
 }
@@ -64,10 +73,18 @@ func (c *Changelog) GetVersionCount() int {
 }
 
 // GetEntryCount returns the total number of entries across all versions.
-func (c *Changelog) GetEntryCount() int {
+func (c *Changelog) GetEntryCount(opts ...QueryOptions) int {
+	var opt QueryOptions
+	if len(opts) > 0 {
+		opt = opts[0]
+	}
 	count := 0
 	for _, v := range c.Versions {
-		count += v.Changes.Count()
+		if opt.IncludeInternal {
+			count += v.MergedChanges().Count()
+		} else {
+			count += v.Changes.Count()
+		}
 	}
 	return count
 }
@@ -78,10 +95,14 @@ func (c *Changelog) HasUnreleased() bool {
 }
 
 // flattenChanges converts a version's changes into a flat entry slice in canonical category order.
-func flattenChanges(v *Version) []Entry {
+func flattenChanges(v *Version, includeInternal bool) []Entry {
+	changes := v.Changes
+	if includeInternal {
+		changes = v.MergedChanges()
+	}
 	var entries []Entry
 	for _, cat := range ValidCategories() {
-		for _, text := range v.Changes.CategoryEntries(cat) {
+		for _, text := range changes.CategoryEntries(cat) {
 			entries = append(entries, Entry{
 				Text:     text,
 				Category: cat,

@@ -7,11 +7,17 @@ import (
 	"gitlab.com/ariel-frischer/chlog/pkg/changelog"
 )
 
+var extractInternal bool
+
 var extractCmd = &cobra.Command{
 	Use:   "extract <version>",
 	Short: "Extract a single version as markdown",
 	Args:  cobra.ExactArgs(1),
 	RunE:  runExtract,
+}
+
+func init() {
+	extractCmd.Flags().BoolVar(&extractInternal, "internal", false, "include internal entries")
 }
 
 func runExtract(cmd *cobra.Command, args []string) error {
@@ -25,5 +31,5 @@ func runExtract(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	return changelog.RenderVersionMarkdown(v, os.Stdout)
+	return changelog.RenderVersionMarkdown(v, os.Stdout, changelog.RenderOptions{IncludeInternal: extractInternal})
 }

@@ -9,11 +9,17 @@ import (
 	"gitlab.com/ariel-frischer/chlog/pkg/changelog"
 )
 
+var checkInternal bool
+
 var checkCmd = &cobra.Command{
 	Use:   "check",
 	Short: "Verify CHANGELOG.md matches CHANGELOG.yaml",
 	Long:  "Exit 0 = in sync, exit 1 = out of sync, exit 2 = validation error.",
 	RunE:  runCheck,
+}
+
+func init() {
+	checkCmd.Flags().BoolVar(&checkInternal, "internal", false, "compare with internal entries included")
 }
 
 func runCheck(cmd *cobra.Command, args []string) error {
@@ -23,7 +29,7 @@ func runCheck(cmd *cobra.Command, args []string) error {
 		os.Exit(2)
 	}
 
-	rendered, err := changelog.RenderMarkdownString(c)
+	rendered, err := changelog.RenderMarkdownString(c, changelog.RenderOptions{IncludeInternal: checkInternal})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "render error: %v\n", err)
 		os.Exit(2)

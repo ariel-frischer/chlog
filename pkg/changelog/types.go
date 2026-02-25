@@ -13,9 +13,22 @@ type Changelog struct {
 
 // Version represents a single version entry in the changelog.
 type Version struct {
-	Version string  `yaml:"version"`
-	Date    string  `yaml:"date,omitempty"`
-	Changes Changes `yaml:"changes"`
+	Version  string  `yaml:"version"`
+	Date     string  `yaml:"date,omitempty"`
+	Changes  Changes `yaml:"changes"`
+	Internal Changes `yaml:"internal,omitempty"`
+}
+
+// MergedChanges returns Changes with internal entries merged in.
+func (v *Version) MergedChanges() Changes {
+	return Changes{
+		Added:      append(append([]string{}, v.Changes.Added...), v.Internal.Added...),
+		Changed:    append(append([]string{}, v.Changes.Changed...), v.Internal.Changed...),
+		Deprecated: append(append([]string{}, v.Changes.Deprecated...), v.Internal.Deprecated...),
+		Removed:    append(append([]string{}, v.Changes.Removed...), v.Internal.Removed...),
+		Fixed:      append(append([]string{}, v.Changes.Fixed...), v.Internal.Fixed...),
+		Security:   append(append([]string{}, v.Changes.Security...), v.Internal.Security...),
+	}
 }
 
 // Changes groups entries by Keep a Changelog categories.

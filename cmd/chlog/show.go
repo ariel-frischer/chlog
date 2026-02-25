@@ -8,8 +8,9 @@ import (
 )
 
 var (
-	showLast  int
-	showPlain bool
+	showLast     int
+	showPlain    bool
+	showInternal bool
 )
 
 var showCmd = &cobra.Command{
@@ -22,6 +23,7 @@ var showCmd = &cobra.Command{
 func init() {
 	showCmd.Flags().IntVarP(&showLast, "last", "n", 0, "show last N entries")
 	showCmd.Flags().BoolVar(&showPlain, "plain", false, "disable colors and icons")
+	showCmd.Flags().BoolVar(&showInternal, "internal", false, "include internal entries")
 }
 
 func runShow(cmd *cobra.Command, args []string) error {
@@ -30,7 +32,7 @@ func runShow(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	opts := changelog.FormatOptions{Plain: showPlain}
+	opts := changelog.FormatOptions{Plain: showPlain, IncludeInternal: showInternal}
 
 	if len(args) == 1 {
 		v, err := c.GetVersion(args[0])
@@ -42,7 +44,7 @@ func runShow(cmd *cobra.Command, args []string) error {
 	}
 
 	if showLast > 0 {
-		entries := c.GetLastN(showLast)
+		entries := c.GetLastN(showLast, changelog.QueryOptions{IncludeInternal: showInternal})
 		for _, e := range entries {
 			fmt.Printf("[%s] %s: %s\n", e.Version, e.Category, e.Text)
 		}
