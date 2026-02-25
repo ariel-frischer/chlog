@@ -1,4 +1,4 @@
-.PHONY: help install test lint format clean build run
+.PHONY: help install i test lint format clean build run go-install
 
 help: ## Show this help message
 	@echo 'Usage: make [target]'
@@ -8,6 +8,11 @@ help: ## Show this help message
 
 install: ## Download dependencies
 	go mod download
+
+i: install ## Alias for install
+
+go-install: ## Install chlog to GOPATH/bin
+	go install ./cmd/chlog/
 
 test: ## Run tests
 	go test ./...
