@@ -7,7 +7,7 @@ Single `CHANGELOG.yaml` source of truth → auto-generated `CHANGELOG.md` → CI
 ## Install
 
 ```bash
-go install github.com/ariel-frischer/chlog@latest
+go install gitlab.com/ariel-frischer/chlog@latest
 ```
 
 ## Usage

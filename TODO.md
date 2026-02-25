@@ -37,4 +37,4 @@
 
 - [ ] `chlog release <version>` — Move unreleased→versioned, add date, create fresh unreleased block
 - [ ] Config file (`.chlog.yaml`) for project-specific settings (repo URL for comparison links, custom categories)
-- [ ] Importable as Go library: `import "github.com/ariel-frischer/chlog/pkg/changelog"`
+- [ ] Importable as Go library: `import "gitlab.com/ariel-frischer/chlog/pkg/changelog"`
