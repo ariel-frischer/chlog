@@ -42,7 +42,7 @@ c7d31b fix: handle nil pointer in auth middleware
 d1a8ef feat: add timeout flag
 e53f90 chore: update deps
 
-# CHANGELOG.yaml (what you write)
+# CHANGELOG.yaml (what you write, or your agent summarizes)
 added:
   - "Configurable request timeout via --timeout flag"
 fixed:
