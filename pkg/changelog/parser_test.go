@@ -91,6 +91,42 @@ func TestValidate(t *testing.T) {
 	}
 }
 
+func TestValidate_EmptyUnreleasedAllowed(t *testing.T) {
+	yaml := `project: test
+versions:
+  - version: unreleased
+    changes: {}
+  - version: 1.0.0
+    date: "2024-01-01"
+    changes:
+      added:
+        - Initial release
+`
+	c, err := LoadFromReader(strings.NewReader(yaml))
+	if err != nil {
+		t.Fatalf("empty unreleased should be valid, got: %v", err)
+	}
+	if !c.HasUnreleased() {
+		t.Error("expected unreleased version")
+	}
+}
+
+func TestValidate_EmptyReleasedRejected(t *testing.T) {
+	yaml := `project: test
+versions:
+  - version: 1.0.0
+    date: "2024-01-01"
+    changes: {}
+`
+	_, err := LoadFromReader(strings.NewReader(yaml))
+	if err == nil {
+		t.Fatal("empty released version should fail validation")
+	}
+	if !strings.Contains(err.Error(), "at least one entry") {
+		t.Errorf("error %q should mention 'at least one entry'", err.Error())
+	}
+}
+
 func TestNormalizeVersion(t *testing.T) {
 	tests := map[string]struct {
 		input string

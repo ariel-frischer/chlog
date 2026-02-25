@@ -10,25 +10,44 @@ Single `CHANGELOG.yaml` source of truth → auto-generated `CHANGELOG.md` → CI
 go install gitlab.com/ariel-frischer/chlog@latest
 ```
 
-## Usage
+## Quickstart
 
 ```bash
-chlog init                  # Create CHANGELOG.yaml in current directory
-chlog sync                  # Generate CHANGELOG.md from CHANGELOG.yaml
-chlog check                 # CI gate — verify markdown matches YAML
-chlog extract 0.3.0         # Output release notes for a version
-chlog validate              # Validate YAML schema
-chlog scaffold              # Auto-scaffold entry from conventional commits
-chlog show                  # View changelog in terminal
-chlog show 0.3.0            # View specific version
-chlog show --last 10        # View last 10 entries
+chlog init                          # Create CHANGELOG.yaml
+chlog sync                          # Generate CHANGELOG.md from YAML
+chlog check                         # CI gate — verify markdown matches YAML
+chlog validate                      # Validate YAML schema
+chlog show                          # View changelog in terminal
+chlog show 0.3.0                    # View specific version
+chlog show --last 5                 # View last 5 entries
+chlog extract 0.3.0                 # Output release notes (for gh release)
+chlog scaffold                      # Auto-scaffold from conventional commits
+chlog scaffold --write              # Scaffold and merge into CHANGELOG.yaml
+chlog scaffold --version 1.2.0      # Scaffold with explicit version string
+chlog release 1.0.0                 # Promote unreleased → 1.0.0 with today's date
+chlog release 1.0.0 --date 2026-03-01  # Promote with explicit date
 ```
 
 ## Why?
 
-Commit-based changelog tools (git-cliff, semantic-release) dump git logs. That's fine for human-curated commits, but with AI agents generating dozens of implementation commits, you need **curated, user-facing entries**.
+Commit-based changelog tools (git-cliff, semantic-release) dump git logs. That's fine for human-curated commits, but with AI agents generating dozens of implementation commits, you want **curated public & internal entries**.
 
-`chlog` separates product communication from implementation history.
+`chlog` separates product communication from implementation history:
+
+```
+# git log (what tools like git-cliff give you)
+a]4f2c1 fix: adjust retry backoff timing
+b92e0a refactor: extract http client helper
+c7d31b fix: handle nil pointer in auth middleware
+d1a8ef feat: add timeout flag
+e53f90 chore: update deps
+
+# CHANGELOG.yaml (what you write)
+added:
+  - "Configurable request timeout via --timeout flag"
+fixed:
+  - "Auth no longer crashes on expired tokens"
+```
 
 ## Schema
 
@@ -39,6 +58,9 @@ versions:
     changes:
       added:
         - "New feature description"
+    internal:
+      changed:
+        - "Refactored auth middleware"
 
   - version: 0.1.0
     date: "2026-02-24"
@@ -51,36 +73,57 @@ versions:
 
 Six categories from [Keep a Changelog](https://keepachangelog.com/): `added`, `changed`, `deprecated`, `removed`, `fixed`, `security`.
 
+### Internal entries
+
+Entries under `internal` are excluded by default. Pass `--internal` to include them:
+
+```bash
+chlog sync --internal       # Render internal entries in CHANGELOG.md
+chlog show --internal       # Show internal entries in terminal
+chlog extract 1.0 --internal
+chlog check --internal      # Compare with internal entries included
+```
+
+Scaffold auto-classifies `refactor`/`perf` commits as internal.
+
+## Config
+
+Optional `.chlog.yaml` in your project root:
+
+```yaml
+repo_url: https://gitlab.com/myorg/myproject
+```
+
+The `repo_url` is used for version comparison links in `CHANGELOG.md`. If omitted, chlog auto-detects from `git remote origin`.
+
 ## CI
 
-Add `.github/workflows/changelog.yml` to validate your changelog on PRs:
+GitHub Actions example:
 
 ```yaml
 name: Changelog Check
-
 on:
   pull_request:
-    paths:
-      - "CHANGELOG.yaml"
-      - "CHANGELOG.md"
-
+    paths: ["CHANGELOG.yaml", "CHANGELOG.md"]
 jobs:
-  changelog-check:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-
       - run: go install gitlab.com/ariel-frischer/chlog@latest
-
-      - name: Validate CHANGELOG.yaml
-        run: chlog validate
-
-      - name: Verify CHANGELOG.md is in sync
-        run: chlog check
+      - run: chlog validate
+      - run: chlog check
 ```
 
-Exit codes: `0` = in sync, `1` = out of sync, `2` = validation error.
+Exit codes: `0` in sync, `1` out of sync, `2` validation error.
+
+## Library
+
+Importable as a Go library:
+
+```go
+import "gitlab.com/ariel-frischer/chlog/pkg/changelog"
+```

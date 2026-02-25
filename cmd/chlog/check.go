@@ -29,7 +29,10 @@ func runCheck(cmd *cobra.Command, args []string) error {
 		os.Exit(2)
 	}
 
-	rendered, err := changelog.RenderMarkdownString(c, changelog.RenderOptions{IncludeInternal: checkInternal})
+	rendered, err := changelog.RenderMarkdownString(c, changelog.RenderOptions{
+		IncludeInternal: checkInternal,
+		Config:          loadConfig(),
+	})
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "render error: %v\n", err)
 		os.Exit(2)

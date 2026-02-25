@@ -90,7 +90,7 @@ func Validate(c *Changelog) []ValidationError {
 			}
 		}
 
-		if v.Changes.IsEmpty() && v.Internal.IsEmpty() {
+		if v.Changes.IsEmpty() && v.Internal.IsEmpty() && !v.IsUnreleased() {
 			errs = append(errs, ValidationError{
 				Field:   prefix + ".changes",
 				Message: "must have at least one entry",
