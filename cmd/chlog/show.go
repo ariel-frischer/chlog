@@ -1,0 +1,54 @@
+package main
+
+import (
+	"fmt"
+
+	"github.com/spf13/cobra"
+	"gitlab.com/ariel-frischer/chlog/pkg/changelog"
+)
+
+var (
+	showLast  int
+	showPlain bool
+)
+
+var showCmd = &cobra.Command{
+	Use:   "show [version]",
+	Short: "Display changelog in terminal",
+	Args:  cobra.MaximumNArgs(1),
+	RunE:  runShow,
+}
+
+func init() {
+	showCmd.Flags().IntVarP(&showLast, "last", "n", 0, "show last N entries")
+	showCmd.Flags().BoolVar(&showPlain, "plain", false, "disable colors and icons")
+}
+
+func runShow(cmd *cobra.Command, args []string) error {
+	c, err := changelog.Load(yamlFile)
+	if err != nil {
+		return err
+	}
+
+	opts := changelog.FormatOptions{Plain: showPlain}
+
+	if len(args) == 1 {
+		v, err := c.GetVersion(args[0])
+		if err != nil {
+			return err
+		}
+		fmt.Print(changelog.FormatVersion(v, opts))
+		return nil
+	}
+
+	if showLast > 0 {
+		entries := c.GetLastN(showLast)
+		for _, e := range entries {
+			fmt.Printf("[%s] %s: %s\n", e.Version, e.Category, e.Text)
+		}
+		return nil
+	}
+
+	fmt.Print(changelog.FormatTerminal(c, opts))
+	return nil
+}

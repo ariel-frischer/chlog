@@ -1,0 +1,7 @@
+project: test-project
+versions:
+  - version: 1.0.0
+    date: "01-01-2024"
+    changes:
+      added:
+        - Initial release

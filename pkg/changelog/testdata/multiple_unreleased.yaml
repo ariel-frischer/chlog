@@ -1,0 +1,10 @@
+project: test-project
+versions:
+  - version: unreleased
+    changes:
+      added:
+        - Feature A
+  - version: Unreleased
+    changes:
+      added:
+        - Feature B
