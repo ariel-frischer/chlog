@@ -6,9 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.1.0] - 2026-02-26
+
 ### Changed
 
 - CHANGELOG.yaml schema uses map-keyed versions instead of list format for less nesting and boilerplate
+
+### Added
+
+- Custom changelog categories with configurable allowlist and strict/non-strict validation modes
+- `chlog add` command for adding entries from the CLI with category validation, version targeting, and internal entry support
+- `chlog remove` command for removing entries with exact or substring matching and empty category cleanup
 
 ## [0.0.4] - 2026-02-26
 
@@ -60,7 +68,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Use correct gitlab.com module path instead of github.com
 
-[Unreleased]: https://github.com/ariel-frischer/chlog/compare/v0.0.4...HEAD
+[Unreleased]: https://github.com/ariel-frischer/chlog/compare/v0.1.0...HEAD
+[0.1.0]: https://github.com/ariel-frischer/chlog/compare/v0.0.4...v0.1.0
 [0.0.4]: https://github.com/ariel-frischer/chlog/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/ariel-frischer/chlog/compare/v0.0.2...v0.0.3
 [0.0.2]: https://github.com/ariel-frischer/chlog/compare/v0.0.1...v0.0.2
