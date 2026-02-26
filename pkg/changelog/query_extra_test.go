@@ -14,11 +14,11 @@ func TestGetVersion_EmptyChangelog(t *testing.T) {
 }
 
 func TestGetUnreleased_None(t *testing.T) {
+	v := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "x")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"x"}},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	if v := c.GetUnreleased(); v != nil {
 		t.Errorf("expected nil, got version %q", v.Version)
@@ -51,11 +51,11 @@ func TestListVersions_Empty(t *testing.T) {
 }
 
 func TestGetLastN_MoreThanAvailable(t *testing.T) {
+	v := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "only one")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"only one"}},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	entries := c.GetLastN(100)
 	if len(entries) != 1 {
@@ -64,11 +64,12 @@ func TestGetLastN_MoreThanAvailable(t *testing.T) {
 }
 
 func TestGetLastN_Zero(t *testing.T) {
+	v := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "a")
+	v.Public.Append("added", "b")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"a", "b"}},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	entries := c.GetLastN(0)
 	if len(entries) != 0 {
@@ -77,11 +78,13 @@ func TestGetLastN_Zero(t *testing.T) {
 }
 
 func TestGetLastN_ExactCount(t *testing.T) {
+	v := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "a")
+	v.Public.Append("added", "b")
+	v.Public.Append("added", "c")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"a", "b", "c"}},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	entries := c.GetLastN(3)
 	if len(entries) != 3 {
@@ -90,12 +93,13 @@ func TestGetLastN_ExactCount(t *testing.T) {
 }
 
 func TestAllEntries_Order(t *testing.T) {
+	unreleased := Version{Version: "unreleased"}
+	unreleased.Public.Append("added", "newest")
+	released := Version{Version: "1.0.0", Date: "2024-01-01"}
+	released.Public.Append("added", "oldest")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{Version: "unreleased", Added: []string{"newest"}},
-			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"oldest"}},
-		},
+		Project:  "test",
+		Versions: []Version{unreleased, released},
 	}
 	entries := c.AllEntries()
 	if len(entries) != 2 {
@@ -110,23 +114,19 @@ func TestAllEntries_Order(t *testing.T) {
 }
 
 func TestAllEntries_CategoryOrder(t *testing.T) {
+	v := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "add")
+	v.Public.Append("fixed", "fix")
+	v.Public.Append("security", "sec")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{
-				Version:  "1.0.0",
-				Date:     "2024-01-01",
-				Fixed:    []string{"fix"},
-				Added:    []string{"add"},
-				Security: []string{"sec"},
-			},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	entries := c.AllEntries()
 	if len(entries) != 3 {
 		t.Fatalf("expected 3 entries, got %d", len(entries))
 	}
-	// Canonical order: added, changed, deprecated, removed, fixed, security
+	// Order follows append order: added, fixed, security
 	if entries[0].Category != "added" {
 		t.Errorf("first category = %q, want 'added'", entries[0].Category)
 	}
@@ -139,11 +139,11 @@ func TestAllEntries_CategoryOrder(t *testing.T) {
 }
 
 func TestHasUnreleased_False(t *testing.T) {
+	v := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "x")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"x"}},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	if c.HasUnreleased() {
 		t.Error("expected false when no unreleased version")
@@ -165,17 +165,15 @@ func TestGetEntryCount_Empty(t *testing.T) {
 }
 
 func TestGetEntryCount_MultipleVersions(t *testing.T) {
+	unreleased := Version{Version: "unreleased"}
+	unreleased.Public.Append("added", "a")
+	released := Version{Version: "1.0.0", Date: "2024-01-01"}
+	released.Public.Append("added", "b")
+	released.Public.Append("fixed", "c")
+	released.Public.Append("fixed", "d")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{Version: "unreleased", Added: []string{"a"}},
-			{
-				Version: "1.0.0",
-				Date:    "2024-01-01",
-				Added:   []string{"b"},
-				Fixed:   []string{"c", "d"},
-			},
-		},
+		Project:  "test",
+		Versions: []Version{unreleased, released},
 	}
 	if got := c.GetEntryCount(); got != 4 {
 		t.Errorf("GetEntryCount() = %d, want 4", got)
@@ -183,11 +181,11 @@ func TestGetEntryCount_MultipleVersions(t *testing.T) {
 }
 
 func TestGetVersion_NormalizesInput(t *testing.T) {
+	v := Version{Version: "2.0.0", Date: "2024-06-01"}
+	v.Public.Append("added", "x")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{Version: "2.0.0", Date: "2024-06-01", Added: []string{"x"}},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	tests := map[string]string{
 		"exact":    "2.0.0",

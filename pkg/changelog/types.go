@@ -148,6 +148,65 @@ func (c *Changes) Append(category, entry string) {
 	c.Categories = append(c.Categories, CategoryEntry{Name: category, Entries: []string{entry}})
 }
 
+// Remove removes an entry from the given category.
+// If substring is true, performs case-insensitive substring matching.
+// Returns the removed entry text on success.
+func (c *Changes) Remove(category, text string, substring bool) (string, error) {
+	catIdx := -1
+	for i := range c.Categories {
+		if c.Categories[i].Name == category {
+			catIdx = i
+			break
+		}
+	}
+	if catIdx == -1 {
+		return "", CategoryNotFoundError{Category: category}
+	}
+
+	entries := c.Categories[catIdx].Entries
+
+	if substring {
+		return c.removeSubstring(catIdx, entries, category, text)
+	}
+	return c.removeExact(catIdx, entries, category, text)
+}
+
+func (c *Changes) removeExact(catIdx int, entries []string, category, text string) (string, error) {
+	for i, e := range entries {
+		if e == text {
+			c.Categories[catIdx].Entries = append(entries[:i], entries[i+1:]...)
+			c.cleanupEmpty(catIdx)
+			return e, nil
+		}
+	}
+	return "", EntryNotFoundError{Category: category, Text: text}
+}
+
+func (c *Changes) removeSubstring(catIdx int, entries []string, category, text string) (string, error) {
+	lower := strings.ToLower(text)
+	var matches []string
+	for _, e := range entries {
+		if strings.Contains(strings.ToLower(e), lower) {
+			matches = append(matches, e)
+		}
+	}
+
+	switch len(matches) {
+	case 0:
+		return "", EntryNotFoundError{Category: category, Text: text}
+	case 1:
+		return c.removeExact(catIdx, entries, category, matches[0])
+	default:
+		return "", MultipleMatchError{Category: category, Text: text, Matches: matches}
+	}
+}
+
+func (c *Changes) cleanupEmpty(catIdx int) {
+	if len(c.Categories[catIdx].Entries) == 0 {
+		c.Categories = append(c.Categories[:catIdx], c.Categories[catIdx+1:]...)
+	}
+}
+
 // Merge appends all entries from other into c, preserving order.
 func (c *Changes) Merge(other Changes) {
 	for _, cat := range other.Categories {
@@ -354,4 +413,34 @@ type VersionNotFoundError struct {
 
 func (e VersionNotFoundError) Error() string {
 	return fmt.Sprintf("version %q not found", e.Version)
+}
+
+// CategoryNotFoundError indicates a requested category does not exist.
+type CategoryNotFoundError struct {
+	Category string
+}
+
+func (e CategoryNotFoundError) Error() string {
+	return fmt.Sprintf("category %q not found", e.Category)
+}
+
+// EntryNotFoundError indicates a requested entry does not exist in a category.
+type EntryNotFoundError struct {
+	Category string
+	Text     string
+}
+
+func (e EntryNotFoundError) Error() string {
+	return fmt.Sprintf("entry %q not found in category %q", e.Text, e.Category)
+}
+
+// MultipleMatchError indicates multiple entries matched a substring search.
+type MultipleMatchError struct {
+	Category string
+	Text     string
+	Matches  []string
+}
+
+func (e MultipleMatchError) Error() string {
+	return fmt.Sprintf("multiple entries in %q match %q: %v", e.Category, e.Text, e.Matches)
 }

@@ -64,14 +64,21 @@ versions:
     security: []
 ```
 
-Six categories from [Keep a Changelog](https://keepachangelog.com/) live directly on each version entry.
+Categories are arbitrary YAML keys on each version. By default, the six [Keep a Changelog](https://keepachangelog.com/) categories are enforced (strict mode). Custom categories can be allowed via config.
 
 ## Config (.chlog.yaml)
 
 ```yaml
 repo_url: https://github.com/org/repo   # Auto-detected from git remote
 include_internal: false                  # Include internal entries by default
+categories: [added, changed, performance] # Custom allowed categories (optional)
+strict_categories: false                 # false = accept any category (optional)
 ```
+
+| Field | Default | Description |
+|-------|---------|-------------|
+| `categories` | Keep a Changelog 6 | Custom allowlist of category names |
+| `strict_categories` | `true` | `false` disables category validation entirely |
 
 ## Scaffold Mapping
 
@@ -101,6 +108,8 @@ import "github.com/ariel-frischer/chlog/pkg/changelog"
 
 c, _ := changelog.Load("CHANGELOG.yaml")
 v, _ := c.GetVersion("1.0.0")
+entries := v.Public.Get("added")       // []string
+v.Public.Append("fixed", "Bug fix")   // add entry
 md, _ := changelog.RenderMarkdownString(c)
 c.Release("2.0.0", "2024-06-01")
 changelog.Save(c, "CHANGELOG.yaml")

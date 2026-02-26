@@ -45,6 +45,8 @@ func init() {
 	rootCmd.AddCommand(showCmd)
 	rootCmd.AddCommand(scaffoldCmd)
 	rootCmd.AddCommand(releaseCmd)
+	rootCmd.AddCommand(addCmd)
+	rootCmd.AddCommand(removeCmd)
 	rootCmd.AddCommand(versionCmd)
 }
 

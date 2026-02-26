@@ -92,7 +92,7 @@ versions:
       - "Bug fix description"
 ```
 
-Six categories from [Keep a Changelog](https://keepachangelog.com/) live directly on each version entry: `added`, `changed`, `deprecated`, `removed`, `fixed`, `security`.
+Categories are arbitrary YAML keys on each version. By default the six [Keep a Changelog](https://keepachangelog.com/) categories are enforced: `added`, `changed`, `deprecated`, `removed`, `fixed`, `security`. Custom categories can be allowed via [config](#config).
 
 ### Internal entries
 
@@ -118,12 +118,16 @@ Optional `.chlog.yaml` in your project root. Created automatically by `chlog ini
 ```yaml
 repo_url: https://github.com/myorg/myproject
 include_internal: true
+categories: [added, changed, fixed, performance]  # custom allowlist (optional)
+strict_categories: false                           # false = accept any category (optional)
 ```
 
 | Field | Default | Description |
 |-------|---------|-------------|
 | `repo_url` | auto-detect from `git remote origin` | Used for version comparison links in `CHANGELOG.md` |
 | `include_internal` | `false` | Include internal entries in all commands (`sync`, `show`, `extract`, `check`) |
+| `categories` | Keep a Changelog 6 | Custom allowlist of category names for validation |
+| `strict_categories` | `true` | Set to `false` to accept any category without validation |
 
 ## CI
 
@@ -177,12 +181,16 @@ c, err := changelog.Load("CHANGELOG.yaml")
 latest := c.GetLatestRelease()
 entries := c.GetLastN(5)
 
+// Access categories
+added := latest.Public.Get("added")       // []string
+latest.Public.Append("fixed", "Bug fix")  // add entry
+
 // Programmatic release
 c.Release("2.0.0", "2024-06-01")
 changelog.Save(c, "CHANGELOG.yaml")
 
 // Render to Markdown
-md := changelog.RenderMarkdown(c, changelog.RenderOptions{})
+md, _ := changelog.RenderMarkdownString(c)
 
 // Parse from any io.Reader
 c, err = changelog.LoadFromReader(reader)

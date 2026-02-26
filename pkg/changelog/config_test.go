@@ -187,8 +187,41 @@ func TestSaveConfig_RoundTrip(t *testing.T) {
 		t.Fatalf("LoadConfig: %v", err)
 	}
 
-	if *loaded != *original {
-		t.Errorf("round-trip mismatch:\n  got:  %+v\n  want: %+v", loaded, original)
+	if loaded.RepoURL != original.RepoURL {
+		t.Errorf("RepoURL mismatch: got %q, want %q", loaded.RepoURL, original.RepoURL)
+	}
+	if loaded.IncludeInternal != original.IncludeInternal {
+		t.Errorf("IncludeInternal mismatch: got %v, want %v", loaded.IncludeInternal, original.IncludeInternal)
+	}
+}
+
+func TestAllowedCategories(t *testing.T) {
+	// Default: returns DefaultCategories
+	cfg := &Config{}
+	allowed := cfg.AllowedCategories()
+	if len(allowed) != 6 {
+		t.Errorf("default allowed = %d, want 6", len(allowed))
+	}
+
+	// Custom categories
+	cfg2 := &Config{Categories: []string{"added", "performance"}}
+	allowed2 := cfg2.AllowedCategories()
+	if len(allowed2) != 2 {
+		t.Errorf("custom allowed = %d, want 2", len(allowed2))
+	}
+
+	// Non-strict: returns nil
+	strictFalse := false
+	cfg3 := &Config{StrictCategories: &strictFalse}
+	if cfg3.AllowedCategories() != nil {
+		t.Error("non-strict should return nil")
+	}
+
+	// Strict true explicitly: returns default
+	strictTrue := true
+	cfg4 := &Config{StrictCategories: &strictTrue}
+	if len(cfg4.AllowedCategories()) != 6 {
+		t.Errorf("strict=true allowed = %d, want 6", len(cfg4.AllowedCategories()))
 	}
 }
 

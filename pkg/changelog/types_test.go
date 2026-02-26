@@ -104,6 +104,106 @@ func TestDefaultCategories(t *testing.T) {
 	}
 }
 
+func TestChanges_Remove(t *testing.T) {
+	tests := map[string]struct {
+		changes   Changes
+		category  string
+		text      string
+		substring bool
+		wantText  string
+		wantErr   interface{} // nil, or error type
+		wantCats  int         // expected category count after removal
+	}{
+		"exact_match": {
+			changes:  makeChangesMulti(map[string][]string{"added": {"Feature A", "Feature B"}}),
+			category: "added", text: "Feature A",
+			wantText: "Feature A", wantCats: 1,
+		},
+		"exact_no_match": {
+			changes:  makeChanges("added", "Feature A"),
+			category: "added", text: "Feature X",
+			wantErr: EntryNotFoundError{},
+		},
+		"category_not_found": {
+			changes:  makeChanges("added", "Feature A"),
+			category: "removed", text: "anything",
+			wantErr: CategoryNotFoundError{},
+		},
+		"substring_match": {
+			changes:   makeChangesMulti(map[string][]string{"fixed": {"Fix login timeout", "Fix signup error"}}),
+			category:  "fixed", text: "login",
+			substring: true,
+			wantText:  "Fix login timeout", wantCats: 1,
+		},
+		"substring_case_insensitive": {
+			changes:   makeChanges("added", "Support Dark Mode"),
+			category:  "added", text: "dark mode",
+			substring: true,
+			wantText:  "Support Dark Mode", wantCats: 0,
+		},
+		"substring_multiple_matches": {
+			changes:   makeChangesMulti(map[string][]string{"fixed": {"Fix login timeout", "Fix login redirect"}}),
+			category:  "fixed", text: "login",
+			substring: true,
+			wantErr:   MultipleMatchError{},
+		},
+		"empty_category_cleanup": {
+			changes:  makeChanges("added", "only entry"),
+			category: "added", text: "only entry",
+			wantText: "only entry", wantCats: 0,
+		},
+		"order_preserved": {
+			changes:  makeChangesMulti(map[string][]string{"added": {"A", "B", "C"}}),
+			category: "added", text: "B",
+			wantText: "B", wantCats: 1,
+		},
+	}
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			got, err := tc.changes.Remove(tc.category, tc.text, tc.substring)
+
+			if tc.wantErr != nil {
+				if err == nil {
+					t.Fatalf("expected error, got nil")
+				}
+				switch tc.wantErr.(type) {
+				case CategoryNotFoundError:
+					if _, ok := err.(CategoryNotFoundError); !ok {
+						t.Fatalf("expected CategoryNotFoundError, got %T", err)
+					}
+				case EntryNotFoundError:
+					if _, ok := err.(EntryNotFoundError); !ok {
+						t.Fatalf("expected EntryNotFoundError, got %T", err)
+					}
+				case MultipleMatchError:
+					if _, ok := err.(MultipleMatchError); !ok {
+						t.Fatalf("expected MultipleMatchError, got %T", err)
+					}
+				}
+				return
+			}
+
+			if err != nil {
+				t.Fatalf("unexpected error: %v", err)
+			}
+			if got != tc.wantText {
+				t.Errorf("Remove() = %q, want %q", got, tc.wantText)
+			}
+			if len(tc.changes.Categories) != tc.wantCats {
+				t.Errorf("categories count = %d, want %d", len(tc.changes.Categories), tc.wantCats)
+			}
+
+			// For order_preserved, verify remaining entries
+			if name == "order_preserved" {
+				entries := tc.changes.Get("added")
+				if len(entries) != 2 || entries[0] != "A" || entries[1] != "C" {
+					t.Errorf("remaining entries = %v, want [A C]", entries)
+				}
+			}
+		})
+	}
+}
+
 // makeChanges creates a Changes with a single category and single entry.
 func makeChanges(category, entry string) Changes {
 	return Changes{Categories: []CategoryEntry{{Name: category, Entries: []string{entry}}}}

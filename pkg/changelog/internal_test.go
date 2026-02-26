@@ -6,32 +6,33 @@ import (
 )
 
 func TestMergedChanges(t *testing.T) {
-	v := &Version{
-		Added:    []string{"public"},
-		Fixed:    []string{"pub-fix"},
-		Internal: Changes{Added: []string{"internal"}, Changed: []string{"refactor"}},
-	}
+	v := &Version{}
+	v.Public.Append("added", "public")
+	v.Public.Append("fixed", "pub-fix")
+	v.Internal.Append("added", "internal")
+	v.Internal.Append("changed", "refactor")
+
 	merged := v.MergedChanges()
 
-	if len(merged.Added) != 2 {
-		t.Errorf("merged.Added = %d, want 2", len(merged.Added))
+	if len(merged.Get("added")) != 2 {
+		t.Errorf("merged.added = %d, want 2", len(merged.Get("added")))
 	}
-	if len(merged.Fixed) != 1 {
-		t.Errorf("merged.Fixed = %d, want 1", len(merged.Fixed))
+	if len(merged.Get("fixed")) != 1 {
+		t.Errorf("merged.fixed = %d, want 1", len(merged.Get("fixed")))
 	}
-	if len(merged.Changed) != 1 {
-		t.Errorf("merged.Changed = %d, want 1", len(merged.Changed))
+	if len(merged.Get("changed")) != 1 {
+		t.Errorf("merged.changed = %d, want 1", len(merged.Get("changed")))
 	}
 }
 
 func TestMergedChanges_DoesNotMutateOriginal(t *testing.T) {
-	v := &Version{
-		Added:    []string{"public"},
-		Internal: Changes{Added: []string{"internal"}},
-	}
+	v := &Version{}
+	v.Public.Append("added", "public")
+	v.Internal.Append("added", "internal")
+
 	_ = v.MergedChanges()
-	if len(v.Added) != 1 {
-		t.Error("MergedChanges mutated original Added")
+	if len(v.Public.Get("added")) != 1 {
+		t.Error("MergedChanges mutated original Public")
 	}
 }
 
@@ -43,14 +44,14 @@ func TestLoad_WithInternal(t *testing.T) {
 	if len(c.Versions) != 2 {
 		t.Fatalf("version count = %d, want 2", len(c.Versions))
 	}
-	if len(c.Versions[0].Internal.Changed) != 1 {
-		t.Errorf("unreleased internal.changed = %d, want 1", len(c.Versions[0].Internal.Changed))
+	if len(c.Versions[0].Internal.Get("changed")) != 1 {
+		t.Errorf("unreleased internal.changed = %d, want 1", len(c.Versions[0].Internal.Get("changed")))
 	}
-	if len(c.Versions[1].Internal.Changed) != 1 {
-		t.Errorf("v1.0.0 internal.changed = %d, want 1", len(c.Versions[1].Internal.Changed))
+	if len(c.Versions[1].Internal.Get("changed")) != 1 {
+		t.Errorf("v1.0.0 internal.changed = %d, want 1", len(c.Versions[1].Internal.Get("changed")))
 	}
-	if len(c.Versions[1].Internal.Fixed) != 1 {
-		t.Errorf("v1.0.0 internal.fixed = %d, want 1", len(c.Versions[1].Internal.Fixed))
+	if len(c.Versions[1].Internal.Get("fixed")) != 1 {
+		t.Errorf("v1.0.0 internal.fixed = %d, want 1", len(c.Versions[1].Internal.Get("fixed")))
 	}
 }
 
@@ -68,16 +69,12 @@ func TestLoad_InternalOnly(t *testing.T) {
 }
 
 func TestValidate_InternalEmptyEntry(t *testing.T) {
+	v := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "public")
+	v.Internal.Append("changed", "")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{
-				Version:  "1.0.0",
-				Date:     "2024-01-01",
-				Added:    []string{"public"},
-				Internal: Changes{Changed: []string{""}},
-			},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	errs := Validate(c)
 	if len(errs) == 0 {
@@ -95,12 +92,10 @@ func TestValidate_InternalEmptyEntry(t *testing.T) {
 }
 
 func TestRenderVersionMarkdown_PublicOnly(t *testing.T) {
-	v := &Version{
-		Version:  "1.0.0",
-		Date:     "2024-01-01",
-		Added:    []string{"Public feature"},
-		Internal: Changes{Changed: []string{"Refactored internals"}},
-	}
+	v := &Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "Public feature")
+	v.Internal.Append("changed", "Refactored internals")
+
 	var b strings.Builder
 	if err := RenderVersionMarkdown(v, &b); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -115,12 +110,10 @@ func TestRenderVersionMarkdown_PublicOnly(t *testing.T) {
 }
 
 func TestRenderVersionMarkdown_WithInternal(t *testing.T) {
-	v := &Version{
-		Version:  "1.0.0",
-		Date:     "2024-01-01",
-		Added:    []string{"Public feature"},
-		Internal: Changes{Changed: []string{"Refactored internals"}},
-	}
+	v := &Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "Public feature")
+	v.Internal.Append("changed", "Refactored internals")
+
 	var b strings.Builder
 	if err := RenderVersionMarkdown(v, &b, RenderOptions{IncludeInternal: true}); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -135,12 +128,10 @@ func TestRenderVersionMarkdown_WithInternal(t *testing.T) {
 }
 
 func TestFormatVersion_PublicOnly(t *testing.T) {
-	v := &Version{
-		Version:  "1.0.0",
-		Date:     "2024-01-01",
-		Added:    []string{"Public"},
-		Internal: Changes{Changed: []string{"Internal"}},
-	}
+	v := &Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "Public")
+	v.Internal.Append("changed", "Internal")
+
 	out := FormatVersion(v, FormatOptions{Plain: true})
 	if strings.Contains(out, "Internal") {
 		t.Error("should not show internal entries without IncludeInternal")
@@ -148,12 +139,10 @@ func TestFormatVersion_PublicOnly(t *testing.T) {
 }
 
 func TestFormatVersion_WithInternal(t *testing.T) {
-	v := &Version{
-		Version:  "1.0.0",
-		Date:     "2024-01-01",
-		Added:    []string{"Public"},
-		Internal: Changes{Changed: []string{"Internal change"}},
-	}
+	v := &Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "Public")
+	v.Internal.Append("changed", "Internal change")
+
 	out := FormatVersion(v, FormatOptions{Plain: true, IncludeInternal: true})
 	if !strings.Contains(out, "Internal change") {
 		t.Error("expected internal entry when IncludeInternal is true")
@@ -161,16 +150,12 @@ func TestFormatVersion_WithInternal(t *testing.T) {
 }
 
 func TestAllEntries_PublicOnly(t *testing.T) {
+	v := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "public")
+	v.Internal.Append("changed", "internal")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{
-				Version:  "1.0.0",
-				Date:     "2024-01-01",
-				Added:    []string{"public"},
-				Internal: Changes{Changed: []string{"internal"}},
-			},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	entries := c.AllEntries()
 	if len(entries) != 1 {
@@ -179,16 +164,12 @@ func TestAllEntries_PublicOnly(t *testing.T) {
 }
 
 func TestAllEntries_WithInternal(t *testing.T) {
+	v := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "public")
+	v.Internal.Append("changed", "internal")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{
-				Version:  "1.0.0",
-				Date:     "2024-01-01",
-				Added:    []string{"public"},
-				Internal: Changes{Changed: []string{"internal"}},
-			},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	entries := c.AllEntries(QueryOptions{IncludeInternal: true})
 	if len(entries) != 2 {
@@ -197,16 +178,13 @@ func TestAllEntries_WithInternal(t *testing.T) {
 }
 
 func TestGetEntryCount_WithInternal(t *testing.T) {
+	v := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "a")
+	v.Internal.Append("changed", "b")
+	v.Internal.Append("changed", "c")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{
-				Version:  "1.0.0",
-				Date:     "2024-01-01",
-				Added:    []string{"a"},
-				Internal: Changes{Changed: []string{"b", "c"}},
-			},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	if got := c.GetEntryCount(); got != 1 {
 		t.Errorf("GetEntryCount() = %d, want 1", got)
@@ -224,17 +202,17 @@ func TestScaffold_InternalRouting(t *testing.T) {
 		{Hash: "d", Subject: "fix: fix bug"},
 	}
 	v := Scaffold(commits, ScaffoldOptions{})
-	if len(v.Added) != 1 {
-		t.Errorf("public added = %d, want 1", len(v.Added))
+	if len(v.Public.Get("added")) != 1 {
+		t.Errorf("public added = %d, want 1", len(v.Public.Get("added")))
 	}
-	if len(v.Fixed) != 1 {
-		t.Errorf("public fixed = %d, want 1", len(v.Fixed))
+	if len(v.Public.Get("fixed")) != 1 {
+		t.Errorf("public fixed = %d, want 1", len(v.Public.Get("fixed")))
 	}
-	if len(v.Changed) != 0 {
-		t.Errorf("public changed = %d, want 0 (refactor/perf should be internal)", len(v.Changed))
+	if len(v.Public.Get("changed")) != 0 {
+		t.Errorf("public changed = %d, want 0 (refactor/perf should be internal)", len(v.Public.Get("changed")))
 	}
-	if len(v.Internal.Changed) != 2 {
-		t.Errorf("internal changed = %d, want 2 (refactor + perf)", len(v.Internal.Changed))
+	if len(v.Internal.Get("changed")) != 2 {
+		t.Errorf("internal changed = %d, want 2 (refactor + perf)", len(v.Internal.Get("changed")))
 	}
 }
 
@@ -243,10 +221,10 @@ func TestScaffold_BreakingRefactorIsPublic(t *testing.T) {
 		{Hash: "a", Subject: "refactor!: new config format"},
 	}
 	v := Scaffold(commits, ScaffoldOptions{})
-	if len(v.Changed) != 1 {
-		t.Errorf("public changed = %d, want 1 (breaking refactor)", len(v.Changed))
+	if len(v.Public.Get("changed")) != 1 {
+		t.Errorf("public changed = %d, want 1 (breaking refactor)", len(v.Public.Get("changed")))
 	}
-	if len(v.Internal.Changed) != 0 {
-		t.Errorf("internal changed = %d, want 0 (breaking is always public)", len(v.Internal.Changed))
+	if len(v.Internal.Get("changed")) != 0 {
+		t.Errorf("internal changed = %d, want 0 (breaking is always public)", len(v.Internal.Get("changed")))
 	}
 }

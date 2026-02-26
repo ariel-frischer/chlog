@@ -38,16 +38,18 @@ CHANGELOG.yaml schema:
       fixed: []
       security: []
       internal:                       # Implementation details (optional)
-        added: []
-        changed: []
-        deprecated: []
-        removed: []
-        fixed: []
-        security: []
+        changed: []                   #   same categories, separate audience
     1.0.0:
       date: "2026-01-15"             # Required for released versions
       added:
         - "Initial release"
+
+Categories are arbitrary YAML keys on each version. The default 6 from Keep
+a Changelog are enforced by default (strict mode). To allow custom categories
+like `performance` or `infrastructure`, add to .chlog.yaml:
+
+  categories: [added, changed, fixed, performance]  # custom allowlist
+  strict_categories: false                           # or disable validation entirely
 ```
 
 ## Example result
