@@ -12,10 +12,7 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/ariel-frischer/chlog)](https://goreportcard.com/report/github.com/ariel-frischer/chlog)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-Single `CHANGELOG.yaml` source of truth → auto-generated `CHANGELOG.md` → CI validation.
-
-One YAML file. Two audiences. No drift.
-Write once in `CHANGELOG.yaml` — generate public release notes and internal changelogs from the same source.
+One YAML source of truth. No drift. Write curated entries, generate release notes.
 
 </div>
 

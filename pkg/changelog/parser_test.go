@@ -28,7 +28,7 @@ func TestLoad_FileNotFound(t *testing.T) {
 func TestLoadFromReader_Valid(t *testing.T) {
 	yaml := `project: myproject
 versions:
-  "1.0.0":
+  1.0.0:
     date: "2024-01-01"
     added:
       - Initial release
@@ -94,7 +94,7 @@ func TestValidate_EmptyUnreleasedAllowed(t *testing.T) {
 	yaml := `project: test
 versions:
   unreleased: {}
-  "1.0.0":
+  1.0.0:
     date: "2024-01-01"
     added:
       - Initial release
@@ -111,7 +111,7 @@ versions:
 func TestValidate_EmptyReleasedRejected(t *testing.T) {
 	yaml := `project: test
 versions:
-  "1.0.0":
+  1.0.0:
     date: "2024-01-01"
 `
 	_, err := LoadFromReader(strings.NewReader(yaml))
