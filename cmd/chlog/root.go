@@ -1,8 +1,9 @@
 package main
 
 import (
-	"github.com/spf13/cobra"
+	"github.com/ariel-frischer/chlog/internal/version"
 	"github.com/ariel-frischer/chlog/pkg/changelog"
+	"github.com/spf13/cobra"
 )
 
 const (
@@ -19,7 +20,7 @@ var rootCmd = &cobra.Command{
 	Use:     "chlog",
 	Short:   "YAML-first changelog management",
 	Long:    "Language-agnostic CLI for YAML-first changelog management.",
-	Version: version,
+	Version: version.Version,
 }
 
 func init() {
@@ -34,6 +35,7 @@ func init() {
 	rootCmd.AddCommand(showCmd)
 	rootCmd.AddCommand(scaffoldCmd)
 	rootCmd.AddCommand(releaseCmd)
+	rootCmd.AddCommand(versionCmd)
 }
 
 func loadConfig() *changelog.Config {

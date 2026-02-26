@@ -1,12 +1,24 @@
-# chlog
+<div align="center">
+
+<pre>
+ ██████╗██╗  ██╗██╗      ██████╗  ██████╗
+██╔════╝██║  ██║██║     ██╔═══██╗██╔════╝
+██║     ███████║██║     ██║   ██║██║  ███╗
+██║     ██╔══██║██║     ██║   ██║██║   ██║
+╚██████╗██║  ██║███████╗╚██████╔╝╚██████╔╝
+ ╚═════╝╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝
+</pre>
+
+**YAML-First Changelog Management**
 
 [![CI](https://github.com/ariel-frischer/chlog/actions/workflows/ci.yml/badge.svg)](https://github.com/ariel-frischer/chlog/actions/workflows/ci.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/ariel-frischer/chlog)](https://github.com/ariel-frischer/chlog/releases/latest)
 [![Go Report Card](https://goreportcard.com/badge/github.com/ariel-frischer/chlog)](https://goreportcard.com/report/github.com/ariel-frischer/chlog)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-Language-agnostic CLI for YAML-first changelog management.
-
 Single `CHANGELOG.yaml` source of truth → auto-generated `CHANGELOG.md` → CI validation.
+
+</div>
 
 ## Install
 

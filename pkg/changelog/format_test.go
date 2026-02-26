@@ -64,9 +64,9 @@ func TestWrapText(t *testing.T) {
 		maxWidth int
 		wantNL   bool
 	}{
-		"short":  {text: "Short text", maxWidth: 80, wantNL: false},
-		"long":   {text: "This is a very long text that should wrap at some point in the output", maxWidth: 30, wantNL: true},
-		"exact":  {text: "fits", maxWidth: 10, wantNL: false},
+		"short": {text: "Short text", maxWidth: 80, wantNL: false},
+		"long":  {text: "This is a very long text that should wrap at some point in the output", maxWidth: 30, wantNL: true},
+		"exact": {text: "fits", maxWidth: 10, wantNL: false},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {

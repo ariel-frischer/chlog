@@ -19,10 +19,10 @@ func TestGetVersion(t *testing.T) {
 		version string
 		wantErr bool
 	}{
-		"exact":         {version: "1.0.0", wantErr: false},
-		"v_prefix":      {version: "v1.0.0", wantErr: false},
-		"unreleased":    {version: "unreleased", wantErr: false},
-		"not_found":     {version: "9.9.9", wantErr: true},
+		"exact":      {version: "1.0.0", wantErr: false},
+		"v_prefix":   {version: "v1.0.0", wantErr: false},
+		"unreleased": {version: "unreleased", wantErr: false},
+		"not_found":  {version: "9.9.9", wantErr: true},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {

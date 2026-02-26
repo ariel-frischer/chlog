@@ -7,11 +7,11 @@ func TestVersion_IsUnreleased(t *testing.T) {
 		version string
 		want    bool
 	}{
-		"lowercase":  {version: "unreleased", want: true},
-		"titlecase":  {version: "Unreleased", want: true},
-		"uppercase":  {version: "UNRELEASED", want: true},
-		"semver":     {version: "1.0.0", want: false},
-		"empty":      {version: "", want: false},
+		"lowercase": {version: "unreleased", want: true},
+		"titlecase": {version: "Unreleased", want: true},
+		"uppercase": {version: "UNRELEASED", want: true},
+		"semver":    {version: "1.0.0", want: false},
+		"empty":     {version: "", want: false},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {

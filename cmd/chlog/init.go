@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/spf13/cobra"
 	"github.com/ariel-frischer/chlog/pkg/changelog"
+	"github.com/spf13/cobra"
 )
 
 var projectName string
