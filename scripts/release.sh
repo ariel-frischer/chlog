@@ -47,14 +47,12 @@ git commit -m "release: ${TAG}"
 echo "==> Tagging ${TAG}..."
 git tag -a "${TAG}" -m "Release ${TAG}"
 
-echo "==> Pushing to origin (GitLab) and gh (GitHub)..."
+echo "==> Pushing to origin..."
 git push origin main
 git push origin "${TAG}"
-git push gh main
-git push gh "${TAG}"
 
 echo ""
-echo "Done! ${TAG} tagged and pushed to both remotes."
+echo "Done! ${TAG} tagged and pushed."
 echo ""
 echo "Next steps:"
 echo "  1. Watch GitHub CI:  gh run watch"
