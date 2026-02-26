@@ -26,7 +26,6 @@ func Load(path string) (*Changelog, error) {
 func LoadFromReader(r io.Reader) (*Changelog, error) {
 	var c Changelog
 	dec := yaml.NewDecoder(r)
-	dec.KnownFields(true)
 	if err := dec.Decode(&c); err != nil {
 		return nil, fmt.Errorf("decoding YAML: %w", err)
 	}

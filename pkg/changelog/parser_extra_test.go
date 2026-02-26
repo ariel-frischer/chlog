@@ -10,7 +10,7 @@ func TestLoadFromReader_UnknownField(t *testing.T) {
 	yaml := `project: test
 unknown_field: should_fail
 versions:
-  - version: 1.0.0
+  "1.0.0":
     date: "2024-01-01"
     added:
       - Init
@@ -159,10 +159,10 @@ func TestSave_BadPath(t *testing.T) {
 func TestLoadFromReader_MultipleVersionsWithAllCategories(t *testing.T) {
 	yaml := `project: full-test
 versions:
-  - version: unreleased
+  unreleased:
     added:
       - Upcoming feature
-  - version: 2.0.0
+  "2.0.0":
     date: "2024-06-01"
     added:
       - Major feature
@@ -176,7 +176,7 @@ versions:
       - Critical bug
     security:
       - Patched CVE
-  - version: 1.0.0
+  "1.0.0":
     date: "2024-01-01"
     added:
       - Initial release

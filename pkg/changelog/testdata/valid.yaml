@@ -1,16 +1,16 @@
 project: test-project
 versions:
-  - version: unreleased
+  unreleased:
     added:
       - New feature in progress
-  - version: 1.1.0
+  "1.1.0":
     date: "2024-03-15"
     added:
       - Added user authentication
       - Added API rate limiting
     fixed:
       - Fixed login redirect bug
-  - version: 1.0.0
+  "1.0.0":
     date: "2024-01-01"
     added:
       - Initial release

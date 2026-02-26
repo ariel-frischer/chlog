@@ -48,13 +48,13 @@ Global flags: `-f` (CHANGELOG.yaml path), `--config` (.chlog.yaml path), `--inte
 ```yaml
 project: my-project
 versions:
-  - version: unreleased
+  unreleased:
     added:
       - "New feature"
     internal:                   # Excluded by default, use --internal
       changed:
         - "Refactored auth"
-  - version: 1.0.0
+  "1.0.0":
     date: "2024-01-01"         # Required for released versions
     added: []
     changed: []

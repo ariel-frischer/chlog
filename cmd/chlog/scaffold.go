@@ -6,7 +6,6 @@ import (
 
 	"github.com/ariel-frischer/chlog/pkg/changelog"
 	"github.com/spf13/cobra"
-	"gopkg.in/yaml.v3"
 )
 
 var (
@@ -48,7 +47,7 @@ func runScaffold(cmd *cobra.Command, args []string) error {
 	}
 
 	if !scaffoldWrite {
-		data, err := yaml.Marshal(v)
+		data, err := changelog.MarshalVersionEntry(v)
 		if err != nil {
 			return fmt.Errorf("marshaling YAML: %w", err)
 		}

@@ -1,8 +1,8 @@
 project: test-project
 versions:
-  - version: unreleased
+  unreleased:
     added:
       - Feature A
-  - version: Unreleased
+  Unreleased:
     added:
       - Feature B

@@ -30,7 +30,7 @@ CHANGELOG.yaml schema:
 
   project: my-project
   versions:
-    - version: unreleased
+    unreleased:
       added: []                       # Public / user-facing categories
       changed: []                     #   live directly on the version
       deprecated: []
@@ -44,7 +44,7 @@ CHANGELOG.yaml schema:
         removed: []
         fixed: []
         security: []
-    - version: 1.0.0
+    "1.0.0":
       date: "2026-01-15"             # Required for released versions
       added:
         - "Initial release"

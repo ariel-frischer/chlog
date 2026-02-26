@@ -1,12 +1,12 @@
 project: test-project
 versions:
-  - version: unreleased
+  unreleased:
     added:
       - Public new feature
     internal:
       changed:
         - Refactored auth middleware
-  - version: 1.0.0
+  "1.0.0":
     date: "2024-01-01"
     added:
       - Initial release

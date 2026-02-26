@@ -80,14 +80,14 @@ See [`prompts/`](prompts/) for copy-paste prompts you can use with any AI agent.
 ```yaml
 project: my-tool
 versions:
-  - version: unreleased
+  unreleased:
     added:
       - "New feature description"
     internal:
       changed:
         - "Refactored auth middleware"
 
-  - version: 0.1.0
+  "0.1.0":
     date: "2026-02-24"
     added:
       - "Initial release"
