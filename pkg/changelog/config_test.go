@@ -107,3 +107,95 @@ func TestConfig_FilePathOverrides(t *testing.T) {
 		t.Errorf("InternalFilePath() = %q, want %q", got, "docs/custom-internal.md")
 	}
 }
+
+func TestSaveConfig(t *testing.T) {
+	tests := map[string]struct {
+		cfg  *Config
+		want map[string]string
+	}{
+		"all fields": {
+			cfg: &Config{
+				RepoURL:         "https://github.com/example/repo",
+				IncludeInternal: true,
+				PublicFile:      "docs/CHANGELOG.md",
+				InternalFile:    "docs/internal.md",
+			},
+			want: map[string]string{
+				"repo_url":         "https://github.com/example/repo",
+				"include_internal": "true",
+				"public_file":      "docs/CHANGELOG.md",
+				"internal_file":    "docs/internal.md",
+			},
+		},
+		"repo url only": {
+			cfg: &Config{RepoURL: "https://github.com/example/repo"},
+			want: map[string]string{
+				"repo_url": "https://github.com/example/repo",
+			},
+		},
+		"empty config": {
+			cfg:  &Config{},
+			want: map[string]string{},
+		},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			dir := t.TempDir()
+			path := filepath.Join(dir, ".chlog.yaml")
+
+			if err := SaveConfig(tc.cfg, path); err != nil {
+				t.Fatalf("SaveConfig: %v", err)
+			}
+
+			got, err := LoadConfig(path)
+			if err != nil {
+				t.Fatalf("LoadConfig: %v", err)
+			}
+
+			if got.RepoURL != tc.cfg.RepoURL {
+				t.Errorf("RepoURL = %q, want %q", got.RepoURL, tc.cfg.RepoURL)
+			}
+			if got.IncludeInternal != tc.cfg.IncludeInternal {
+				t.Errorf("IncludeInternal = %v, want %v", got.IncludeInternal, tc.cfg.IncludeInternal)
+			}
+			if got.PublicFile != tc.cfg.PublicFile {
+				t.Errorf("PublicFile = %q, want %q", got.PublicFile, tc.cfg.PublicFile)
+			}
+			if got.InternalFile != tc.cfg.InternalFile {
+				t.Errorf("InternalFile = %q, want %q", got.InternalFile, tc.cfg.InternalFile)
+			}
+		})
+	}
+}
+
+func TestSaveConfig_RoundTrip(t *testing.T) {
+	dir := t.TempDir()
+	path := filepath.Join(dir, ".chlog.yaml")
+
+	original := &Config{
+		RepoURL:         "https://github.com/test/project",
+		IncludeInternal: true,
+	}
+
+	if err := SaveConfig(original, path); err != nil {
+		t.Fatalf("SaveConfig: %v", err)
+	}
+
+	loaded, err := LoadConfig(path)
+	if err != nil {
+		t.Fatalf("LoadConfig: %v", err)
+	}
+
+	if *loaded != *original {
+		t.Errorf("round-trip mismatch:\n  got:  %+v\n  want: %+v", loaded, original)
+	}
+}
+
+func TestSaveConfig_BadPath(t *testing.T) {
+	cfg := &Config{RepoURL: "https://example.com"}
+	err := SaveConfig(cfg, "/nonexistent/dir/.chlog.yaml")
+	if err == nil {
+		t.Fatal("expected error for bad path, got nil")
+	}
+}

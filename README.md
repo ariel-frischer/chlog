@@ -41,7 +41,8 @@ make build    # Binary at bin/chlog
 ## Quickstart
 
 ```bash
-chlog init                          # Create CHANGELOG.yaml
+chlog init                          # Create CHANGELOG.yaml + .chlog.yaml (auto-detects repo URL)
+chlog init --project myapp          # Skip project name prompt
 chlog sync                          # Generate CHANGELOG.md from YAML
 chlog check                         # CI gate — verify markdown matches YAML
 chlog validate                      # Validate YAML schema
@@ -120,7 +121,7 @@ To always include internal entries, set `include_internal: true` in `.chlog.yaml
 
 ## Config
 
-Optional `.chlog.yaml` in your project root:
+Optional `.chlog.yaml` in your project root. Created automatically by `chlog init` with auto-detected values:
 
 ```yaml
 repo_url: https://github.com/myorg/myproject

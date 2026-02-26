@@ -55,6 +55,18 @@ func LoadConfig(path string) (*Config, error) {
 	return &cfg, nil
 }
 
+// SaveConfig writes a config to the given path.
+func SaveConfig(cfg *Config, path string) error {
+	data, err := yaml.Marshal(cfg)
+	if err != nil {
+		return fmt.Errorf("marshaling config: %w", err)
+	}
+	if err := os.WriteFile(path, data, 0644); err != nil {
+		return fmt.Errorf("writing config %s: %w", path, err)
+	}
+	return nil
+}
+
 // ResolveRepoURL returns the repo URL from config, falling back to git remote detection.
 func ResolveRepoURL(cfg *Config) string {
 	if cfg != nil && cfg.RepoURL != "" {
