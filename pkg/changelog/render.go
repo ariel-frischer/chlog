@@ -20,9 +20,15 @@ func RenderMarkdown(c *Changelog, w io.Writer, opts ...RenderOptions) error {
 		opt = opts[0]
 	}
 
-	fmt.Fprintf(w, "# Changelog\n\n")
-	fmt.Fprintf(w, "All notable changes to %s will be documented in this file.\n\n", c.Project)
-	fmt.Fprintf(w, "The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).\n\n")
+	if _, err := fmt.Fprintf(w, "# Changelog\n\n"); err != nil {
+		return err
+	}
+	if _, err := fmt.Fprintf(w, "All notable changes to %s will be documented in this file.\n\n", c.Project); err != nil {
+		return err
+	}
+	if _, err := fmt.Fprintf(w, "The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).\n\n"); err != nil {
+		return err
+	}
 
 	for _, v := range c.Versions {
 		if err := RenderVersionMarkdown(&v, w, opt); err != nil {
@@ -54,9 +60,13 @@ func RenderVersionMarkdown(v *Version, w io.Writer, opts ...RenderOptions) error
 	}
 
 	if v.IsUnreleased() {
-		fmt.Fprintf(w, "## [Unreleased]\n\n")
+		if _, err := fmt.Fprintf(w, "## [Unreleased]\n\n"); err != nil {
+			return err
+		}
 	} else {
-		fmt.Fprintf(w, "## [%s] - %s\n\n", v.Version, v.Date)
+		if _, err := fmt.Fprintf(w, "## [%s] - %s\n\n", v.Version, v.Date); err != nil {
+			return err
+		}
 	}
 
 	changes := v.Public
@@ -68,11 +78,17 @@ func RenderVersionMarkdown(v *Version, w io.Writer, opts ...RenderOptions) error
 		if len(cat.Entries) == 0 {
 			continue
 		}
-		fmt.Fprintf(w, "### %s\n\n", titleCase(cat.Name))
-		for _, entry := range cat.Entries {
-			fmt.Fprintf(w, "- %s\n", entry)
+		if _, err := fmt.Fprintf(w, "### %s\n\n", titleCase(cat.Name)); err != nil {
+			return err
 		}
-		fmt.Fprintln(w)
+		for _, entry := range cat.Entries {
+			if _, err := fmt.Fprintf(w, "- %s\n", entry); err != nil {
+				return err
+			}
+		}
+		if _, err := fmt.Fprintln(w); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -102,11 +118,11 @@ func renderComparisonLinks(c *Changelog, w io.Writer, repoURL string) {
 		if v.IsUnreleased() {
 			if i+1 < len(c.Versions) {
 				prev := c.Versions[i+1].Version
-				fmt.Fprintf(w, "[Unreleased]: %s%sv%s...HEAD\n", repoURL, comparePath, prev)
+				_, _ = fmt.Fprintf(w, "[Unreleased]: %s%sv%s...HEAD\n", repoURL, comparePath, prev)
 			}
 		} else if i+1 < len(c.Versions) && !c.Versions[i+1].IsUnreleased() {
 			prev := c.Versions[i+1].Version
-			fmt.Fprintf(w, "[%s]: %s%sv%s...v%s\n", v.Version, repoURL, comparePath, prev, v.Version)
+			_, _ = fmt.Fprintf(w, "[%s]: %s%sv%s...v%s\n", v.Version, repoURL, comparePath, prev, v.Version)
 		}
 	}
 }

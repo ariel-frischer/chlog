@@ -1,7 +1,6 @@
 package main
 
 import (
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -234,12 +233,4 @@ func loadTestChangelog(t *testing.T, path string) *changelog.Changelog {
 		t.Fatalf("loading test changelog: %v", err)
 	}
 	return c
-}
-
-// ensureNoFile verifies a file does not exist.
-func ensureNoFile(t *testing.T, path string) {
-	t.Helper()
-	if _, err := os.Stat(path); !os.IsNotExist(err) {
-		t.Fatalf("expected file not to exist: %s", path)
-	}
 }

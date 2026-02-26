@@ -18,7 +18,7 @@ func Load(path string) (*Changelog, error) {
 	if err != nil {
 		return nil, fmt.Errorf("opening changelog: %w", err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 	return LoadFromReader(f)
 }
 

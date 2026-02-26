@@ -19,7 +19,9 @@ func TestLoadConfig_Missing(t *testing.T) {
 func TestLoadConfig_Valid(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, ".chlog.yaml")
-	os.WriteFile(path, []byte("repo_url: https://github.com/example/repo\n"), 0644)
+	if err := os.WriteFile(path, []byte("repo_url: https://github.com/example/repo\n"), 0644); err != nil {
+		t.Fatalf("writing config: %v", err)
+	}
 
 	cfg, err := LoadConfig(path)
 	if err != nil {
@@ -33,7 +35,9 @@ func TestLoadConfig_Valid(t *testing.T) {
 func TestLoadConfig_IncludeInternal(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, ".chlog.yaml")
-	os.WriteFile(path, []byte("include_internal: true\n"), 0644)
+	if err := os.WriteFile(path, []byte("include_internal: true\n"), 0644); err != nil {
+		t.Fatalf("writing config: %v", err)
+	}
 
 	cfg, err := LoadConfig(path)
 	if err != nil {
@@ -47,7 +51,9 @@ func TestLoadConfig_IncludeInternal(t *testing.T) {
 func TestLoadConfig_IncludeInternalDefault(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, ".chlog.yaml")
-	os.WriteFile(path, []byte("repo_url: https://example.com\n"), 0644)
+	if err := os.WriteFile(path, []byte("repo_url: https://example.com\n"), 0644); err != nil {
+		t.Fatalf("writing config: %v", err)
+	}
 
 	cfg, err := LoadConfig(path)
 	if err != nil {
@@ -74,7 +80,9 @@ func TestResolveRepoURL_NilConfig(t *testing.T) {
 func TestLoadConfig_FileOverrides(t *testing.T) {
 	dir := t.TempDir()
 	path := filepath.Join(dir, ".chlog.yaml")
-	os.WriteFile(path, []byte("public_file: public.md\ninternal_file: docs/internal.md\n"), 0644)
+	if err := os.WriteFile(path, []byte("public_file: public.md\ninternal_file: docs/internal.md\n"), 0644); err != nil {
+		t.Fatalf("writing config: %v", err)
+	}
 
 	cfg, err := LoadConfig(path)
 	if err != nil {
