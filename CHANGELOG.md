@@ -56,7 +56,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Use correct gitlab.com module path instead of github.com
 
-[Unreleased]: https://gitlab.com/ariel-frischer/chlog/-/compare/v0.0.4...HEAD
-[0.0.4]: https://gitlab.com/ariel-frischer/chlog/-/compare/v0.0.3...v0.0.4
-[0.0.3]: https://gitlab.com/ariel-frischer/chlog/-/compare/v0.0.2...v0.0.3
-[0.0.2]: https://gitlab.com/ariel-frischer/chlog/-/compare/v0.0.1...v0.0.2
+[Unreleased]: https://github.com/ariel-frischer/chlog/compare/v0.0.4...HEAD
+[0.0.4]: https://github.com/ariel-frischer/chlog/compare/v0.0.3...v0.0.4
+[0.0.3]: https://github.com/ariel-frischer/chlog/compare/v0.0.2...v0.0.3
+[0.0.2]: https://github.com/ariel-frischer/chlog/compare/v0.0.1...v0.0.2
