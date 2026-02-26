@@ -246,11 +246,9 @@ check_path() {
 # Main installation function
 main() {
     echo ""
-    printf '%b  ___  _  _  _     ___    ___ %b\n' "${GREEN}" "${NC}"
-    printf '%b / __|| || || |   / _ \  / __|%b\n' "${GREEN}" "${NC}"
-    printf '%b| (__ | __ || |__| (_) || (_ |%b\n' "${GREEN}" "${NC}"
-    printf '%b \___||_||_||____|\___/  \___|%b\n' "${GREEN}" "${NC}"
-    echo "       Installer"
+    printf '%b█▀▀ █ █ █   █▀█ █▀▀%b\n' "${GREEN}" "${NC}"
+    printf '%b█▄▄ █▀█ █▄▄ █▄█ █▄█%b\n' "${GREEN}" "${NC}"
+    echo "      Installer"
     echo ""
 
     check_dependencies
