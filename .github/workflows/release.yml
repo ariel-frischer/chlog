@@ -66,6 +66,9 @@ jobs:
           echo "Release notes:"
           cat .release/notes.md
 
+      - name: Clean up build artifacts so git is clean for GoReleaser
+        run: rm -f chlog-extract
+
       - name: Run GoReleaser
         uses: goreleaser/goreleaser-action@v6
         with:
