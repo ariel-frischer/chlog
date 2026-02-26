@@ -32,7 +32,9 @@ func runShow(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	opts := changelog.FormatOptions{Plain: showPlain, IncludeInternal: showInternal}
+	cfg := loadConfig()
+	internal := showInternal || cfg.IncludeInternal
+	opts := changelog.FormatOptions{Plain: showPlain, IncludeInternal: internal}
 
 	if len(args) == 1 {
 		v, err := c.GetVersion(args[0])
@@ -44,7 +46,7 @@ func runShow(cmd *cobra.Command, args []string) error {
 	}
 
 	if showLast > 0 {
-		entries := c.GetLastN(showLast, changelog.QueryOptions{IncludeInternal: showInternal})
+		entries := c.GetLastN(showLast, changelog.QueryOptions{IncludeInternal: internal})
 		for _, e := range entries {
 			fmt.Printf("[%s] %s: %s\n", e.Version, e.Category, e.Text)
 		}

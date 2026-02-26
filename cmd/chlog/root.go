@@ -1,8 +1,11 @@
 package main
 
 import (
+	"os"
+
 	"github.com/ariel-frischer/chlog/internal/version"
 	"github.com/ariel-frischer/chlog/pkg/changelog"
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 )
 
@@ -24,6 +27,13 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
+	// Disable colors when not writing to a terminal.
+	if fi, err := os.Stdout.Stat(); err == nil {
+		if fi.Mode()&os.ModeCharDevice == 0 {
+			color.NoColor = true
+		}
+	}
+
 	rootCmd.PersistentFlags().StringVarP(&yamlFile, "file", "f", defaultYAMLFile, "path to CHANGELOG.yaml")
 	rootCmd.PersistentFlags().StringVar(&configFile, "config", changelog.DefaultConfigFile, "path to config file")
 

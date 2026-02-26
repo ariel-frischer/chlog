@@ -2,14 +2,12 @@ package changelog
 
 import (
 	"fmt"
-	"os"
 	"strings"
 
 	"github.com/fatih/color"
 )
 
-// CategoryStyle defines the icon and color for a category.
-type CategoryStyle struct {
+type categoryStyle struct {
 	Icon  string
 	Color *color.Color
 }
@@ -21,22 +19,13 @@ type FormatOptions struct {
 	IncludeInternal bool
 }
 
-var categoryStyles = map[string]CategoryStyle{
+var categoryStyles = map[string]categoryStyle{
 	"added":      {Icon: "+", Color: color.New(color.FgGreen)},
 	"changed":    {Icon: "~", Color: color.New(color.FgYellow)},
 	"deprecated": {Icon: "!", Color: color.New(color.FgYellow)},
 	"removed":    {Icon: "-", Color: color.New(color.FgRed)},
 	"fixed":      {Icon: "x", Color: color.New(color.FgCyan)},
 	"security":   {Icon: "🔒", Color: color.New(color.FgMagenta)},
-}
-
-func init() {
-	// Disable colors when not writing to a terminal.
-	if fi, err := os.Stdout.Stat(); err == nil {
-		if fi.Mode()&os.ModeCharDevice == 0 {
-			color.NoColor = true
-		}
-	}
 }
 
 // FormatTerminal formats the entire changelog for terminal output.

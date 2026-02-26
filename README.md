@@ -5,7 +5,7 @@
 █▄▄ █▀█ █▄▄ █▄█ █▄█
 </pre>
 
-**YAML-First Changelog Management**
+**YAML-First Changelog Management — CLI + Go Library**
 
 [![CI](https://github.com/ariel-frischer/chlog/actions/workflows/ci.yml/badge.svg)](https://github.com/ariel-frischer/chlog/actions/workflows/ci.yml)
 [![GitHub Release](https://img.shields.io/github/v/release/ariel-frischer/chlog)](https://github.com/ariel-frischer/chlog/releases/latest)
@@ -103,7 +103,9 @@ Six categories from [Keep a Changelog](https://keepachangelog.com/): `added`, `c
 
 ### Internal entries
 
-Entries under `internal` are excluded by default. Pass `--internal` to include them:
+chlog supports a two-tier model: **public** entries (customer-facing release notes) and **internal** entries (implementation details like refactors, perf improvements, dependency updates). Public entries live under `changes`, internal entries under `internal` — same categories, separate audiences.
+
+By default, internal entries are excluded from output. Include them with `--internal`:
 
 ```bash
 chlog sync --internal       # Render internal entries in CHANGELOG.md
@@ -112,7 +114,9 @@ chlog extract 1.0 --internal
 chlog check --internal      # Compare with internal entries included
 ```
 
-Scaffold auto-classifies `refactor`/`perf` commits as internal.
+To always include internal entries, set `include_internal: true` in `.chlog.yaml` (see [Config](#config)). The `--internal` flag and config option are OR'd together — config provides the team default, the flag always adds them.
+
+`chlog scaffold` auto-classifies `refactor`/`perf` conventional commits as internal, so `scaffold --write` populates both tiers automatically.
 
 ## Config
 
@@ -120,9 +124,13 @@ Optional `.chlog.yaml` in your project root:
 
 ```yaml
 repo_url: https://github.com/myorg/myproject
+include_internal: true
 ```
 
-The `repo_url` is used for version comparison links in `CHANGELOG.md`. If omitted, chlog auto-detects from `git remote origin`.
+| Field | Default | Description |
+|-------|---------|-------------|
+| `repo_url` | auto-detect from `git remote origin` | Used for version comparison links in `CHANGELOG.md` |
+| `include_internal` | `false` | Include internal entries in all commands (`sync`, `show`, `extract`, `check`) |
 
 ## CI
 
@@ -150,11 +158,28 @@ Exit codes: `0` in sync, `1` out of sync, `2` validation error.
 
 ## Library
 
-Importable as a Go library:
+`chlog` is both a CLI tool and an importable Go library. Use `pkg/changelog` directly in your own Go projects for programmatic changelog management — no subprocess needed.
 
 ```go
 import "github.com/ariel-frischer/chlog/pkg/changelog"
+
+// Load and query
+c, err := changelog.Load("CHANGELOG.yaml")
+latest := c.GetLatestRelease()
+entries := c.GetLastN(5)
+
+// Programmatic release
+c.Release("2.0.0", "2024-06-01")
+changelog.Save(c, "CHANGELOG.yaml")
+
+// Render to Markdown
+md := changelog.RenderMarkdown(c, changelog.RenderOptions{})
+
+// Parse from any io.Reader
+c, err = changelog.LoadFromReader(reader)
 ```
+
+See the [package documentation](https://pkg.go.dev/github.com/ariel-frischer/chlog/pkg/changelog) for the full API.
 
 ## Contributing
 

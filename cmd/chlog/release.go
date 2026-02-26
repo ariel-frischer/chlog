@@ -23,25 +23,11 @@ func init() {
 }
 
 func runRelease(cmd *cobra.Command, args []string) error {
-	version := args[0]
+	ver := args[0]
 
 	c, err := changelog.Load(yamlFile)
 	if err != nil {
 		return err
-	}
-
-	unreleased := c.GetUnreleased()
-	if unreleased == nil {
-		return fmt.Errorf("no unreleased version found")
-	}
-
-	if unreleased.Changes.IsEmpty() && unreleased.Internal.IsEmpty() {
-		return fmt.Errorf("unreleased version has no entries")
-	}
-
-	// Check for duplicate version
-	if _, err := c.GetVersion(version); err == nil {
-		return fmt.Errorf("version %q already exists", version)
 	}
 
 	date := releaseDate
@@ -49,20 +35,14 @@ func runRelease(cmd *cobra.Command, args []string) error {
 		date = time.Now().Format("2006-01-02")
 	}
 
-	// Stamp unreleased → versioned
-	unreleased.Version = version
-	unreleased.Date = date
-
-	// Prepend fresh unreleased block
-	c.Versions = append([]changelog.Version{{
-		Version: "unreleased",
-		Changes: changelog.Changes{},
-	}}, c.Versions...)
+	if err := c.Release(ver, date); err != nil {
+		return err
+	}
 
 	if err := changelog.Save(c, yamlFile); err != nil {
 		return fmt.Errorf("saving %s: %w", yamlFile, err)
 	}
 
-	fmt.Printf("Released %s (%s) — unreleased block reset\n", version, date)
+	fmt.Printf("Released %s (%s) — unreleased block reset\n", ver, date)
 	return nil
 }

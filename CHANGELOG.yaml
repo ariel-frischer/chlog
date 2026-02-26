@@ -1,0 +1,46 @@
+project: chlog
+versions:
+    - version: unreleased
+      changes: {}
+
+    - version: 0.0.4
+      date: "2026-02-26"
+      changes:
+        added:
+            - Version command with build info display
+            - ASCII branding for CLI
+            - Production CI workflow
+            - Open source GitHub release preparation (LICENSE, .goreleaser config)
+
+    - version: 0.0.3
+      date: "2026-02-25"
+      changes:
+        added:
+            - Support for internal changelog entries (excluded from public CHANGELOG.md)
+            - "`chlog release` command to promote unreleased changes to a versioned release"
+            - Configuration section and `.chlog.yaml` file support
+            - Tests for config loading and repo URL resolution
+        changed:
+            - README restructured with Quickstart section, new command examples, and clearer usage instructions
+        fixed:
+            - Include config loading in check command for proper validation
+            - Allow empty unreleased versions while enforcing non-empty released versions
+
+    - version: 0.0.2
+      date: "2026-02-25"
+      changes:
+        added:
+            - Core CLI with init, check, extract, sync, validate, and show commands
+            - YAML-based changelog parsing and validation
+            - Markdown rendering from CHANGELOG.yaml
+            - Terminal output with colors and icons
+        changed:
+            - Makefile install target alias and go-install target for streamlined dependency management
+
+    - version: 0.0.1
+      date: "2026-02-24"
+      changes:
+        added:
+            - Initial project scaffolding (Go module, directory structure, Makefile)
+        fixed:
+            - Use correct gitlab.com module path instead of github.com

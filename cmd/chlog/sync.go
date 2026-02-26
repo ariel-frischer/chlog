@@ -9,7 +9,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var syncInternal bool
+var (
+	syncInternal bool
+	syncSplit    bool
+)
 
 var syncCmd = &cobra.Command{
 	Use:   "sync",
@@ -19,6 +22,7 @@ var syncCmd = &cobra.Command{
 
 func init() {
 	syncCmd.Flags().BoolVar(&syncInternal, "internal", false, "include internal entries")
+	syncCmd.Flags().BoolVar(&syncSplit, "split", false, "generate both public and internal changelogs")
 }
 
 func runSync(cmd *cobra.Command, args []string) error {
@@ -27,24 +31,42 @@ func runSync(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	cfg := loadConfig()
+
+	if syncSplit {
+		return runSyncSplit(c, cfg)
+	}
+
+	internal := syncInternal || cfg.IncludeInternal
+	return syncFile(c, cfg, internal, defaultMDFile)
+}
+
+func runSyncSplit(c *changelog.Changelog, cfg *changelog.Config) error {
+	if err := syncFile(c, cfg, false, cfg.PublicFilePath()); err != nil {
+		return err
+	}
+	return syncFile(c, cfg, true, cfg.InternalFilePath())
+}
+
+func syncFile(c *changelog.Changelog, cfg *changelog.Config, internal bool, path string) error {
 	rendered, err := changelog.RenderMarkdownString(c, changelog.RenderOptions{
-		IncludeInternal: syncInternal,
-		Config:          loadConfig(),
+		IncludeInternal: internal,
+		Config:          cfg,
 	})
 	if err != nil {
 		return fmt.Errorf("rendering markdown: %w", err)
 	}
 
-	existing, _ := os.ReadFile(defaultMDFile)
+	existing, _ := os.ReadFile(path)
 	if bytes.Equal(existing, []byte(rendered)) {
-		fmt.Println("CHANGELOG.md is up to date")
+		fmt.Printf("%s is up to date\n", path)
 		return nil
 	}
 
-	if err := os.WriteFile(defaultMDFile, []byte(rendered), 0644); err != nil {
-		return fmt.Errorf("writing %s: %w", defaultMDFile, err)
+	if err := os.WriteFile(path, []byte(rendered), 0644); err != nil {
+		return fmt.Errorf("writing %s: %w", path, err)
 	}
 
-	fmt.Printf("Generated %s\n", defaultMDFile)
+	fmt.Printf("Generated %s\n", path)
 	return nil
 }

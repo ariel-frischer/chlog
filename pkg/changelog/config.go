@@ -7,11 +7,34 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
-const DefaultConfigFile = ".chlog.yaml"
+const (
+	DefaultConfigFile   = ".chlog.yaml"
+	DefaultPublicFile   = "CHANGELOG.md"
+	DefaultInternalFile = "CHANGELOG-internal.md"
+)
 
 // Config holds project-specific chlog settings.
 type Config struct {
-	RepoURL string `yaml:"repo_url,omitempty"`
+	RepoURL         string `yaml:"repo_url,omitempty"`
+	IncludeInternal bool   `yaml:"include_internal,omitempty"`
+	PublicFile      string `yaml:"public_file,omitempty"`
+	InternalFile    string `yaml:"internal_file,omitempty"`
+}
+
+// PublicFilePath returns PublicFile if set, otherwise the default.
+func (c *Config) PublicFilePath() string {
+	if c.PublicFile != "" {
+		return c.PublicFile
+	}
+	return DefaultPublicFile
+}
+
+// InternalFilePath returns InternalFile if set, otherwise the default.
+func (c *Config) InternalFilePath() string {
+	if c.InternalFile != "" {
+		return c.InternalFile
+	}
+	return DefaultInternalFile
 }
 
 // LoadConfig reads a config file from the given path.

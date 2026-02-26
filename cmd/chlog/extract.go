@@ -31,5 +31,8 @@ func runExtract(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	return changelog.RenderVersionMarkdown(v, os.Stdout, changelog.RenderOptions{IncludeInternal: extractInternal})
+	cfg := loadConfig()
+	internal := extractInternal || cfg.IncludeInternal
+
+	return changelog.RenderVersionMarkdown(v, os.Stdout, changelog.RenderOptions{IncludeInternal: internal})
 }
