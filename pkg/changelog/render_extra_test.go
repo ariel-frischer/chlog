@@ -102,9 +102,9 @@ func TestRenderMarkdown_WithComparisonLinks(t *testing.T) {
 	c := &Changelog{
 		Project: "test-project",
 		Versions: []Version{
-			{Version: "unreleased", Changes: Changes{Added: []string{"WIP"}}},
-			{Version: "2.0.0", Date: "2024-06-01", Changes: Changes{Added: []string{"Feature"}}},
-			{Version: "1.0.0", Date: "2024-01-01", Changes: Changes{Added: []string{"Init"}}},
+			{Version: "unreleased", Added: []string{"WIP"}},
+			{Version: "2.0.0", Date: "2024-06-01", Added: []string{"Feature"}},
+			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Init"}},
 		},
 	}
 	cfg := &Config{RepoURL: "https://github.com/org/repo"}
@@ -128,7 +128,7 @@ func TestRenderMarkdown_NoLinksWithoutConfig(t *testing.T) {
 	c := &Changelog{
 		Project: "test",
 		Versions: []Version{
-			{Version: "1.0.0", Date: "2024-01-01", Changes: Changes{Added: []string{"Init"}}},
+			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Init"}},
 		},
 	}
 	out, err := RenderMarkdownString(c)
@@ -142,16 +142,14 @@ func TestRenderMarkdown_NoLinksWithoutConfig(t *testing.T) {
 
 func TestRenderVersionMarkdown_AllCategories(t *testing.T) {
 	v := &Version{
-		Version: "1.0.0",
-		Date:    "2024-01-01",
-		Changes: Changes{
-			Added:      []string{"New thing"},
-			Changed:    []string{"Updated thing"},
-			Deprecated: []string{"Old thing"},
-			Removed:    []string{"Gone thing"},
-			Fixed:      []string{"Fixed thing"},
-			Security:   []string{"Secure thing"},
-		},
+		Version:    "1.0.0",
+		Date:       "2024-01-01",
+		Added:      []string{"New thing"},
+		Changed:    []string{"Updated thing"},
+		Deprecated: []string{"Old thing"},
+		Removed:    []string{"Gone thing"},
+		Fixed:      []string{"Fixed thing"},
+		Security:   []string{"Secure thing"},
 	}
 	var b strings.Builder
 	if err := RenderVersionMarkdown(v, &b); err != nil {
@@ -178,7 +176,6 @@ func TestRenderVersionMarkdown_AllCategories(t *testing.T) {
 func TestRenderVersionMarkdown_EmptyChanges(t *testing.T) {
 	v := &Version{
 		Version: "unreleased",
-		Changes: Changes{},
 	}
 	var b strings.Builder
 	if err := RenderVersionMarkdown(v, &b); err != nil {

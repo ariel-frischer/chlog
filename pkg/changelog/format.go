@@ -66,7 +66,7 @@ func FormatVersion(v *Version, opts FormatOptions) string {
 		fmt.Fprintf(&b, "%s\n", bold.Sprint(header))
 	}
 
-	changes := v.Changes
+	changes := v.Changes()
 	if opts.IncludeInternal {
 		changes = v.MergedChanges()
 	}

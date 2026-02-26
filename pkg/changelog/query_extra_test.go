@@ -17,7 +17,7 @@ func TestGetUnreleased_None(t *testing.T) {
 	c := &Changelog{
 		Project: "test",
 		Versions: []Version{
-			{Version: "1.0.0", Date: "2024-01-01", Changes: Changes{Added: []string{"x"}}},
+			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"x"}},
 		},
 	}
 	if v := c.GetUnreleased(); v != nil {
@@ -54,7 +54,7 @@ func TestGetLastN_MoreThanAvailable(t *testing.T) {
 	c := &Changelog{
 		Project: "test",
 		Versions: []Version{
-			{Version: "1.0.0", Date: "2024-01-01", Changes: Changes{Added: []string{"only one"}}},
+			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"only one"}},
 		},
 	}
 	entries := c.GetLastN(100)
@@ -67,7 +67,7 @@ func TestGetLastN_Zero(t *testing.T) {
 	c := &Changelog{
 		Project: "test",
 		Versions: []Version{
-			{Version: "1.0.0", Date: "2024-01-01", Changes: Changes{Added: []string{"a", "b"}}},
+			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"a", "b"}},
 		},
 	}
 	entries := c.GetLastN(0)
@@ -80,7 +80,7 @@ func TestGetLastN_ExactCount(t *testing.T) {
 	c := &Changelog{
 		Project: "test",
 		Versions: []Version{
-			{Version: "1.0.0", Date: "2024-01-01", Changes: Changes{Added: []string{"a", "b", "c"}}},
+			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"a", "b", "c"}},
 		},
 	}
 	entries := c.GetLastN(3)
@@ -93,8 +93,8 @@ func TestAllEntries_Order(t *testing.T) {
 	c := &Changelog{
 		Project: "test",
 		Versions: []Version{
-			{Version: "unreleased", Changes: Changes{Added: []string{"newest"}}},
-			{Version: "1.0.0", Date: "2024-01-01", Changes: Changes{Added: []string{"oldest"}}},
+			{Version: "unreleased", Added: []string{"newest"}},
+			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"oldest"}},
 		},
 	}
 	entries := c.AllEntries()
@@ -114,13 +114,11 @@ func TestAllEntries_CategoryOrder(t *testing.T) {
 		Project: "test",
 		Versions: []Version{
 			{
-				Version: "1.0.0",
-				Date:    "2024-01-01",
-				Changes: Changes{
-					Fixed:    []string{"fix"},
-					Added:    []string{"add"},
-					Security: []string{"sec"},
-				},
+				Version:  "1.0.0",
+				Date:     "2024-01-01",
+				Fixed:    []string{"fix"},
+				Added:    []string{"add"},
+				Security: []string{"sec"},
 			},
 		},
 	}
@@ -144,7 +142,7 @@ func TestHasUnreleased_False(t *testing.T) {
 	c := &Changelog{
 		Project: "test",
 		Versions: []Version{
-			{Version: "1.0.0", Date: "2024-01-01", Changes: Changes{Added: []string{"x"}}},
+			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"x"}},
 		},
 	}
 	if c.HasUnreleased() {
@@ -170,11 +168,12 @@ func TestGetEntryCount_MultipleVersions(t *testing.T) {
 	c := &Changelog{
 		Project: "test",
 		Versions: []Version{
-			{Version: "unreleased", Changes: Changes{Added: []string{"a"}}},
+			{Version: "unreleased", Added: []string{"a"}},
 			{
 				Version: "1.0.0",
 				Date:    "2024-01-01",
-				Changes: Changes{Added: []string{"b"}, Fixed: []string{"c", "d"}},
+				Added:   []string{"b"},
+				Fixed:   []string{"c", "d"},
 			},
 		},
 	}
@@ -187,13 +186,13 @@ func TestGetVersion_NormalizesInput(t *testing.T) {
 	c := &Changelog{
 		Project: "test",
 		Versions: []Version{
-			{Version: "2.0.0", Date: "2024-06-01", Changes: Changes{Added: []string{"x"}}},
+			{Version: "2.0.0", Date: "2024-06-01", Added: []string{"x"}},
 		},
 	}
 	tests := map[string]string{
-		"exact":     "2.0.0",
-		"v-prefix":  "v2.0.0",
-		"V-prefix":  "V2.0.0",
+		"exact":    "2.0.0",
+		"v-prefix": "v2.0.0",
+		"V-prefix": "V2.0.0",
 	}
 	for name, input := range tests {
 		t.Run(name, func(t *testing.T) {

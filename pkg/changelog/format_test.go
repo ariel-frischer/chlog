@@ -9,10 +9,8 @@ func TestFormatVersion_Plain(t *testing.T) {
 	v := &Version{
 		Version: "1.0.0",
 		Date:    "2024-01-01",
-		Changes: Changes{
-			Added: []string{"Feature A"},
-			Fixed: []string{"Bug B"},
-		},
+		Added:   []string{"Feature A"},
+		Fixed:   []string{"Bug B"},
 	}
 	out := FormatVersion(v, FormatOptions{Plain: true})
 
@@ -33,7 +31,7 @@ func TestFormatVersion_Plain(t *testing.T) {
 func TestFormatVersion_Unreleased(t *testing.T) {
 	v := &Version{
 		Version: "unreleased",
-		Changes: Changes{Added: []string{"WIP"}},
+		Added:   []string{"WIP"},
 	}
 	out := FormatVersion(v, FormatOptions{Plain: true})
 	if !strings.Contains(out, "[Unreleased]") {
@@ -48,7 +46,7 @@ func TestFormatTerminal_Plain(t *testing.T) {
 			{
 				Version: "1.0.0",
 				Date:    "2024-01-01",
-				Changes: Changes{Added: []string{"Init"}},
+				Added:   []string{"Init"},
 			},
 		},
 	}

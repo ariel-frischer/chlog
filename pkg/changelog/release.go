@@ -10,7 +10,7 @@ func (c *Changelog) Release(version, date string) error {
 		return fmt.Errorf("no unreleased version found")
 	}
 
-	if unreleased.Changes.IsEmpty() && unreleased.Internal.IsEmpty() {
+	if unreleased.IsEmpty() && unreleased.Internal.IsEmpty() {
 		return fmt.Errorf("unreleased version has no entries")
 	}
 
@@ -23,7 +23,6 @@ func (c *Changelog) Release(version, date string) error {
 
 	c.Versions = append([]Version{{
 		Version: "unreleased",
-		Changes: Changes{},
 	}}, c.Versions...)
 
 	return nil

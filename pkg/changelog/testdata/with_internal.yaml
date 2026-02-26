@@ -1,17 +1,15 @@
 project: test-project
 versions:
   - version: unreleased
-    changes:
-      added:
-        - Public new feature
+    added:
+      - Public new feature
     internal:
       changed:
         - Refactored auth middleware
   - version: 1.0.0
     date: "2024-01-01"
-    changes:
-      added:
-        - Initial release
+    added:
+      - Initial release
     internal:
       changed:
         - Optimized database queries

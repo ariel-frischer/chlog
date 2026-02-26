@@ -42,7 +42,7 @@ func runScaffold(cmd *cobra.Command, args []string) error {
 	}
 
 	v := changelog.Scaffold(commits, changelog.ScaffoldOptions{Version: scaffoldVersion})
-	if v.Changes.IsEmpty() && v.Internal.IsEmpty() {
+	if v.IsEmpty() && v.Internal.IsEmpty() {
 		fmt.Println("No conventional commits found")
 		return nil
 	}
@@ -70,8 +70,7 @@ func writeScaffold(v *changelog.Version) error {
 
 	existing := c.GetUnreleased()
 	if existing != nil && v.Version == "unreleased" {
-		mergeChanges(&existing.Changes, &v.Changes)
-		mergeChanges(&existing.Internal, &v.Internal)
+		mergeVersionChanges(existing, v)
 	} else {
 		c.Versions = append([]changelog.Version{*v}, c.Versions...)
 	}
@@ -80,15 +79,21 @@ func writeScaffold(v *changelog.Version) error {
 		return fmt.Errorf("saving %s: %w", yamlFile, err)
 	}
 
-	fmt.Printf("Updated %s with %d entries\n", yamlFile, v.Changes.Count()+v.Internal.Count())
+	fmt.Printf("Updated %s with %d entries\n", yamlFile, v.Count()+v.Internal.Count())
 	return nil
 }
 
-func mergeChanges(dst, src *changelog.Changes) {
+func mergeVersionChanges(dst, src *changelog.Version) {
 	dst.Added = append(dst.Added, src.Added...)
 	dst.Changed = append(dst.Changed, src.Changed...)
 	dst.Deprecated = append(dst.Deprecated, src.Deprecated...)
 	dst.Removed = append(dst.Removed, src.Removed...)
 	dst.Fixed = append(dst.Fixed, src.Fixed...)
 	dst.Security = append(dst.Security, src.Security...)
+	dst.Internal.Added = append(dst.Internal.Added, src.Internal.Added...)
+	dst.Internal.Changed = append(dst.Internal.Changed, src.Internal.Changed...)
+	dst.Internal.Deprecated = append(dst.Internal.Deprecated, src.Internal.Deprecated...)
+	dst.Internal.Removed = append(dst.Internal.Removed, src.Internal.Removed...)
+	dst.Internal.Fixed = append(dst.Internal.Fixed, src.Internal.Fixed...)
+	dst.Internal.Security = append(dst.Internal.Security, src.Internal.Security...)
 }

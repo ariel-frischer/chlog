@@ -14,28 +14,15 @@
 
 Single `CHANGELOG.yaml` source of truth → auto-generated `CHANGELOG.md` → CI validation.
 
+One YAML file. Two audiences. No drift.
+Write once in `CHANGELOG.yaml` — generate public release notes and internal changelogs from the same source.
+
 </div>
 
 ## Install
 
-**Quick install** (Linux/macOS):
-
 ```bash
 curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/install.sh | sh
-```
-
-**Go install**:
-
-```bash
-go install github.com/ariel-frischer/chlog@latest
-```
-
-**From source**:
-
-```bash
-git clone https://github.com/ariel-frischer/chlog.git
-cd chlog
-make build    # Binary at bin/chlog
 ```
 
 ## Quickstart
@@ -59,7 +46,7 @@ chlog release 1.0.0 --date 2026-03-01  # Promote with explicit date
 
 ## Why?
 
-Commit-based changelog tools (git-cliff, semantic-release) dump git logs. That's fine for human-curated commits, but with AI agents generating dozens of implementation commits, you want **curated public & internal entries**.
+Commit-based changelog tools (git-cliff, semantic-release) dump raw git logs. That works when humans write every commit, but AI agents generate dozens of implementation commits per feature. You don't want that noise in your release notes — you want **curated entries that tell users what actually changed**.
 
 `chlog` separates product communication from implementation history:
 
@@ -78,33 +65,41 @@ fixed:
   - "Auth no longer crashes on expired tokens"
 ```
 
+### Using AI agents with chlog
+
+Two workflows — use one or both:
+
+**Per-change** — agent adds a changelog entry as part of each feature or fix. Install the [SKILL.md](#ai-agent-skill) so your agent knows the YAML schema and commands, then include "update CHANGELOG.yaml" in your task prompt. The agent writes the entry inline while the context is fresh.
+
+**At release time** — agent reviews all commits since the last release, groups them into user-facing summaries, and writes the YAML. `chlog scaffold --write` gives it a starting point from conventional commits, then the agent curates.
+
+See [`prompts/`](prompts/) for copy-paste prompts you can use with any AI agent.
+
 ## Schema
 
 ```yaml
 project: my-tool
 versions:
   - version: unreleased
-    changes:
-      added:
-        - "New feature description"
+    added:
+      - "New feature description"
     internal:
       changed:
         - "Refactored auth middleware"
 
   - version: 0.1.0
     date: "2026-02-24"
-    changes:
-      added:
-        - "Initial release"
-      fixed:
-        - "Bug fix description"
+    added:
+      - "Initial release"
+    fixed:
+      - "Bug fix description"
 ```
 
-Six categories from [Keep a Changelog](https://keepachangelog.com/): `added`, `changed`, `deprecated`, `removed`, `fixed`, `security`.
+Six categories from [Keep a Changelog](https://keepachangelog.com/) live directly on each version entry: `added`, `changed`, `deprecated`, `removed`, `fixed`, `security`.
 
 ### Internal entries
 
-chlog supports a two-tier model: **public** entries (customer-facing release notes) and **internal** entries (implementation details like refactors, perf improvements, dependency updates). Public entries live under `changes`, internal entries under `internal` — same categories, separate audiences.
+chlog supports a two-tier model: **public** entries (customer-facing release notes) and **internal** entries (implementation details like refactors, perf improvements, dependency updates). Public entries live directly on the version, internal entries under `internal` — same categories, separate audiences.
 
 By default, internal entries are excluded from output. Include them with `--internal`:
 
@@ -156,6 +151,22 @@ jobs:
 ```
 
 Exit codes: `0` in sync, `1` out of sync, `2` validation error.
+
+## Other Install Options
+
+**Go install**:
+
+```bash
+go install github.com/ariel-frischer/chlog@latest
+```
+
+**From source**:
+
+```bash
+git clone https://github.com/ariel-frischer/chlog.git
+cd chlog
+make build    # Binary at bin/chlog
+```
 
 ## Library
 
@@ -223,6 +234,26 @@ chlog completion fish > ~/.config/fish/completions/chlog.fish
 ```powershell
 chlog completion powershell | Out-String | Invoke-Expression
 ```
+
+## AI Agent Skill
+
+chlog ships a [SKILL.md](.skills/default/SKILL.md) following the [agent skills open standard](https://agentskills.io). Compatible with Claude Code, Cursor, Codex, Gemini CLI, VS Code, and 20+ other agents.
+
+**Install with [skills CLI](https://github.com/nicepkg/agent-skills):**
+
+```bash
+npx skills add https://github.com/ariel-frischer/chlog
+```
+
+**Manual install (Claude Code):**
+
+```bash
+mkdir -p ~/.claude/skills/chlog
+curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
+  -o ~/.claude/skills/chlog/SKILL.md
+```
+
+Then use `/chlog` in conversations to get changelog command guidance.
 
 ## Contributing
 

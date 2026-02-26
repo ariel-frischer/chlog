@@ -130,14 +130,14 @@ func TestScaffold(t *testing.T) {
 	if v.Version != "unreleased" {
 		t.Errorf("version = %q, want unreleased", v.Version)
 	}
-	if len(v.Changes.Added) != 1 {
-		t.Errorf("added count = %d, want 1", len(v.Changes.Added))
+	if len(v.Added) != 1 {
+		t.Errorf("added count = %d, want 1", len(v.Added))
 	}
-	if len(v.Changes.Fixed) != 1 {
-		t.Errorf("fixed count = %d, want 1", len(v.Changes.Fixed))
+	if len(v.Fixed) != 1 {
+		t.Errorf("fixed count = %d, want 1", len(v.Fixed))
 	}
-	if len(v.Changes.Changed) != 1 {
-		t.Errorf("changed count = %d, want 1 (breaking refactor)", len(v.Changes.Changed))
+	if len(v.Changed) != 1 {
+		t.Errorf("changed count = %d, want 1 (breaking refactor)", len(v.Changed))
 	}
 }
 
@@ -153,7 +153,7 @@ func TestScaffold_CustomVersion(t *testing.T) {
 
 func TestScaffold_EmptyCommits(t *testing.T) {
 	v := Scaffold(nil, ScaffoldOptions{})
-	if !v.Changes.IsEmpty() {
+	if !v.IsEmpty() {
 		t.Error("expected empty changes for nil commits")
 	}
 }

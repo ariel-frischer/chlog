@@ -13,8 +13,8 @@ func TestRelease(t *testing.T) {
 			changelog: &Changelog{
 				Project: "test",
 				Versions: []Version{
-					{Version: "unreleased", Changes: Changes{Added: []string{"New feature"}}},
-					{Version: "1.0.0", Date: "2024-01-01", Changes: Changes{Added: []string{"Init"}}},
+					{Version: "unreleased", Added: []string{"New feature"}},
+					{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Init"}},
 				},
 			},
 			version: "2.0.0",
@@ -24,7 +24,7 @@ func TestRelease(t *testing.T) {
 			changelog: &Changelog{
 				Project: "test",
 				Versions: []Version{
-					{Version: "1.0.0", Date: "2024-01-01", Changes: Changes{Added: []string{"Init"}}},
+					{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Init"}},
 				},
 			},
 			version: "2.0.0",
@@ -35,7 +35,7 @@ func TestRelease(t *testing.T) {
 			changelog: &Changelog{
 				Project: "test",
 				Versions: []Version{
-					{Version: "unreleased", Changes: Changes{}},
+					{Version: "unreleased"},
 				},
 			},
 			version: "1.0.0",
@@ -46,8 +46,8 @@ func TestRelease(t *testing.T) {
 			changelog: &Changelog{
 				Project: "test",
 				Versions: []Version{
-					{Version: "unreleased", Changes: Changes{Fixed: []string{"Bug fix"}}},
-					{Version: "1.0.0", Date: "2024-01-01", Changes: Changes{Added: []string{"Init"}}},
+					{Version: "unreleased", Fixed: []string{"Bug fix"}},
+					{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Init"}},
 				},
 			},
 			version: "1.0.0",
@@ -58,8 +58,8 @@ func TestRelease(t *testing.T) {
 			changelog: &Changelog{
 				Project: "test",
 				Versions: []Version{
-					{Version: "unreleased", Changes: Changes{Fixed: []string{"Bug fix"}}},
-					{Version: "1.0.0", Date: "2024-01-01", Changes: Changes{Added: []string{"Init"}}},
+					{Version: "unreleased", Fixed: []string{"Bug fix"}},
+					{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Init"}},
 				},
 			},
 			version: "v1.0.0",
@@ -70,7 +70,7 @@ func TestRelease(t *testing.T) {
 			changelog: &Changelog{
 				Project: "test",
 				Versions: []Version{
-					{Version: "unreleased", Changes: Changes{}, Internal: Changes{Changed: []string{"Refactored internals"}}},
+					{Version: "unreleased", Internal: Changes{Changed: []string{"Refactored internals"}}},
 				},
 			},
 			version: "1.0.0",
@@ -100,7 +100,7 @@ func TestRelease(t *testing.T) {
 			if !tc.changelog.Versions[0].IsUnreleased() {
 				t.Errorf("first version should be unreleased, got %q", tc.changelog.Versions[0].Version)
 			}
-			if !tc.changelog.Versions[0].Changes.IsEmpty() {
+			if !tc.changelog.Versions[0].IsEmpty() {
 				t.Error("new unreleased block should have empty changes")
 			}
 
@@ -120,9 +120,9 @@ func TestRelease_PreservesExistingVersions(t *testing.T) {
 	c := &Changelog{
 		Project: "test",
 		Versions: []Version{
-			{Version: "unreleased", Changes: Changes{Added: []string{"Feature A", "Feature B"}}},
-			{Version: "1.1.0", Date: "2024-03-01", Changes: Changes{Fixed: []string{"Bug"}}},
-			{Version: "1.0.0", Date: "2024-01-01", Changes: Changes{Added: []string{"Init"}}},
+			{Version: "unreleased", Added: []string{"Feature A", "Feature B"}},
+			{Version: "1.1.0", Date: "2024-03-01", Fixed: []string{"Bug"}},
+			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Init"}},
 		},
 	}
 
@@ -143,7 +143,7 @@ func TestRelease_PreservesExistingVersions(t *testing.T) {
 
 	// Verify the released version kept its entries
 	released := c.Versions[1]
-	if len(released.Changes.Added) != 2 {
-		t.Errorf("released changes.added = %d entries, want 2", len(released.Changes.Added))
+	if len(released.Added) != 2 {
+		t.Errorf("released added = %d entries, want 2", len(released.Added))
 	}
 }

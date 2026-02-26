@@ -86,8 +86,8 @@ func TestFormatTerminal_MultipleVersions(t *testing.T) {
 	c := &Changelog{
 		Project: "test",
 		Versions: []Version{
-			{Version: "unreleased", Changes: Changes{Added: []string{"WIP"}}},
-			{Version: "1.0.0", Date: "2024-01-01", Changes: Changes{Added: []string{"Init"}}},
+			{Version: "unreleased", Added: []string{"WIP"}},
+			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Init"}},
 		},
 	}
 	out := FormatTerminal(c, FormatOptions{Plain: true})
@@ -110,7 +110,7 @@ func TestFormatTerminal_DefaultMaxWidth(t *testing.T) {
 	c := &Changelog{
 		Project: "test",
 		Versions: []Version{
-			{Version: "1.0.0", Date: "2024-01-01", Changes: Changes{Added: []string{"Feature"}}},
+			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Feature"}},
 		},
 	}
 	// MaxWidth=0 should use default of 80
@@ -123,7 +123,6 @@ func TestFormatTerminal_DefaultMaxWidth(t *testing.T) {
 func TestFormatVersion_EmptyChanges(t *testing.T) {
 	v := &Version{
 		Version: "unreleased",
-		Changes: Changes{},
 	}
 	out := FormatVersion(v, FormatOptions{Plain: true})
 	if !strings.Contains(out, "[Unreleased]") {
@@ -138,13 +137,11 @@ func TestFormatVersion_EmptyChanges(t *testing.T) {
 
 func TestFormatVersion_CategoryOrder(t *testing.T) {
 	v := &Version{
-		Version: "1.0.0",
-		Date:    "2024-01-01",
-		Changes: Changes{
-			Security: []string{"Patched vuln"},
-			Added:    []string{"New thing"},
-			Fixed:    []string{"Bug fix"},
-		},
+		Version:  "1.0.0",
+		Date:     "2024-01-01",
+		Security: []string{"Patched vuln"},
+		Added:    []string{"New thing"},
+		Fixed:    []string{"Bug fix"},
 	}
 	out := FormatVersion(v, FormatOptions{Plain: true})
 

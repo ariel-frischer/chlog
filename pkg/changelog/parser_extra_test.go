@@ -12,9 +12,8 @@ unknown_field: should_fail
 versions:
   - version: 1.0.0
     date: "2024-01-01"
-    changes:
-      added:
-        - Init
+    added:
+      - Init
 `
 	_, err := LoadFromReader(strings.NewReader(yaml))
 	if err == nil {
@@ -43,7 +42,7 @@ func TestValidate_EmptyVersionString(t *testing.T) {
 	c := &Changelog{
 		Project: "test",
 		Versions: []Version{
-			{Version: "", Date: "2024-01-01", Changes: Changes{Added: []string{"x"}}},
+			{Version: "", Date: "2024-01-01", Added: []string{"x"}},
 		},
 	}
 	errs := Validate(c)
@@ -65,7 +64,7 @@ func TestValidate_DateMissing(t *testing.T) {
 	c := &Changelog{
 		Project: "test",
 		Versions: []Version{
-			{Version: "1.0.0", Changes: Changes{Added: []string{"x"}}},
+			{Version: "1.0.0", Added: []string{"x"}},
 		},
 	}
 	errs := Validate(c)
@@ -95,8 +94,8 @@ func TestValidate_MultipleErrors(t *testing.T) {
 	c := &Changelog{
 		Project: "",
 		Versions: []Version{
-			{Version: "1.0.0", Date: "not-a-date", Changes: Changes{Added: []string{"x"}}},
-			{Version: "1.0.0", Date: "2024-01-01", Changes: Changes{Added: []string{"y"}}},
+			{Version: "1.0.0", Date: "not-a-date", Added: []string{"x"}},
+			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"y"}},
 		},
 	}
 	errs := Validate(c)
@@ -111,16 +110,14 @@ func TestSave_RoundTrip(t *testing.T) {
 		Versions: []Version{
 			{
 				Version: "unreleased",
-				Changes: Changes{Added: []string{"WIP feature"}},
+				Added:   []string{"WIP feature"},
 			},
 			{
-				Version: "1.0.0",
-				Date:    "2024-01-01",
-				Changes: Changes{
-					Added:    []string{"Feature A", "Feature B"},
-					Fixed:    []string{"Bug fix"},
-					Security: []string{"CVE patch"},
-				},
+				Version:  "1.0.0",
+				Date:     "2024-01-01",
+				Added:    []string{"Feature A", "Feature B"},
+				Fixed:    []string{"Bug fix"},
+				Security: []string{"CVE patch"},
 				Internal: Changes{Changed: []string{"Refactored handler"}},
 			},
 		},
@@ -142,9 +139,9 @@ func TestSave_RoundTrip(t *testing.T) {
 	if len(loaded.Versions) != len(original.Versions) {
 		t.Fatalf("version count = %d, want %d", len(loaded.Versions), len(original.Versions))
 	}
-	if loaded.Versions[1].Changes.Count() != original.Versions[1].Changes.Count() {
+	if loaded.Versions[1].Count() != original.Versions[1].Count() {
 		t.Errorf("entry count mismatch: got %d, want %d",
-			loaded.Versions[1].Changes.Count(), original.Versions[1].Changes.Count())
+			loaded.Versions[1].Count(), original.Versions[1].Count())
 	}
 	if len(loaded.Versions[1].Internal.Changed) != 1 {
 		t.Error("internal changes not preserved in round-trip")
@@ -163,29 +160,26 @@ func TestLoadFromReader_MultipleVersionsWithAllCategories(t *testing.T) {
 	yaml := `project: full-test
 versions:
   - version: unreleased
-    changes:
-      added:
-        - Upcoming feature
+    added:
+      - Upcoming feature
   - version: 2.0.0
     date: "2024-06-01"
-    changes:
-      added:
-        - Major feature
-      changed:
-        - Updated API
-      deprecated:
-        - Old endpoint
-      removed:
-        - Legacy code
-      fixed:
-        - Critical bug
-      security:
-        - Patched CVE
+    added:
+      - Major feature
+    changed:
+      - Updated API
+    deprecated:
+      - Old endpoint
+    removed:
+      - Legacy code
+    fixed:
+      - Critical bug
+    security:
+      - Patched CVE
   - version: 1.0.0
     date: "2024-01-01"
-    changes:
-      added:
-        - Initial release
+    added:
+      - Initial release
 `
 	c, err := LoadFromReader(strings.NewReader(yaml))
 	if err != nil {
@@ -196,8 +190,8 @@ versions:
 	}
 
 	v2 := c.Versions[1]
-	if v2.Changes.Count() != 6 {
-		t.Errorf("v2.0.0 entry count = %d, want 6", v2.Changes.Count())
+	if v2.Count() != 6 {
+		t.Errorf("v2.0.0 entry count = %d, want 6", v2.Count())
 	}
 }
 

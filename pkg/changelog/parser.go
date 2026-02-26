@@ -90,18 +90,18 @@ func Validate(c *Changelog) []ValidationError {
 			}
 		}
 
-		if v.Changes.IsEmpty() && v.Internal.IsEmpty() && !v.IsUnreleased() {
+		if v.IsEmpty() && v.Internal.IsEmpty() && !v.IsUnreleased() {
 			errs = append(errs, ValidationError{
-				Field:   prefix + ".changes",
+				Field:   prefix,
 				Message: "must have at least one entry",
 			})
 		}
 
 		for _, cat := range ValidCategories() {
-			for j, entry := range v.Changes.CategoryEntries(cat) {
+			for j, entry := range v.CategoryEntries(cat) {
 				if strings.TrimSpace(entry) == "" {
 					errs = append(errs, ValidationError{
-						Field:   fmt.Sprintf("%s.changes.%s[%d]", prefix, cat, j),
+						Field:   fmt.Sprintf("%s.%s[%d]", prefix, cat, j),
 						Message: "entry must not be empty",
 					})
 				}

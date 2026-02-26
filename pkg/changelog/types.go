@@ -13,22 +13,54 @@ type Changelog struct {
 
 // Version represents a single version entry in the changelog.
 type Version struct {
-	Version  string  `yaml:"version"`
-	Date     string  `yaml:"date,omitempty"`
-	Changes  Changes `yaml:"changes"`
-	Internal Changes `yaml:"internal,omitempty"`
+	Version    string   `yaml:"version"`
+	Date       string   `yaml:"date,omitempty"`
+	Added      []string `yaml:"added,omitempty"`
+	Changed    []string `yaml:"changed,omitempty"`
+	Deprecated []string `yaml:"deprecated,omitempty"`
+	Removed    []string `yaml:"removed,omitempty"`
+	Fixed      []string `yaml:"fixed,omitempty"`
+	Security   []string `yaml:"security,omitempty"`
+	Internal   Changes  `yaml:"internal,omitempty"`
+}
+
+// Changes returns a Changes value built from the version's direct category fields.
+func (v *Version) Changes() Changes {
+	return Changes{
+		Added:      v.Added,
+		Changed:    v.Changed,
+		Deprecated: v.Deprecated,
+		Removed:    v.Removed,
+		Fixed:      v.Fixed,
+		Security:   v.Security,
+	}
 }
 
 // MergedChanges returns Changes with internal entries merged in.
 func (v *Version) MergedChanges() Changes {
 	return Changes{
-		Added:      append(append([]string{}, v.Changes.Added...), v.Internal.Added...),
-		Changed:    append(append([]string{}, v.Changes.Changed...), v.Internal.Changed...),
-		Deprecated: append(append([]string{}, v.Changes.Deprecated...), v.Internal.Deprecated...),
-		Removed:    append(append([]string{}, v.Changes.Removed...), v.Internal.Removed...),
-		Fixed:      append(append([]string{}, v.Changes.Fixed...), v.Internal.Fixed...),
-		Security:   append(append([]string{}, v.Changes.Security...), v.Internal.Security...),
+		Added:      append(append([]string{}, v.Added...), v.Internal.Added...),
+		Changed:    append(append([]string{}, v.Changed...), v.Internal.Changed...),
+		Deprecated: append(append([]string{}, v.Deprecated...), v.Internal.Deprecated...),
+		Removed:    append(append([]string{}, v.Removed...), v.Internal.Removed...),
+		Fixed:      append(append([]string{}, v.Fixed...), v.Internal.Fixed...),
+		Security:   append(append([]string{}, v.Security...), v.Internal.Security...),
 	}
+}
+
+// IsEmpty returns true if all category lists on this version are empty.
+func (v *Version) IsEmpty() bool {
+	return v.Changes().IsEmpty()
+}
+
+// Count returns the total number of entries across all categories on this version.
+func (v *Version) Count() int {
+	return v.Changes().Count()
+}
+
+// CategoryEntries returns the entries for a given category name on this version.
+func (v *Version) CategoryEntries(category string) []string {
+	return v.Changes().CategoryEntries(category)
 }
 
 // Changes groups entries by Keep a Changelog categories.

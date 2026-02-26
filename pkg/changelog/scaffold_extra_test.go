@@ -87,7 +87,7 @@ func TestScaffold_InternalNonBreakingRefactorAndPerf(t *testing.T) {
 	}
 	v := Scaffold(commits, ScaffoldOptions{})
 
-	if !v.Changes.IsEmpty() {
+	if !v.IsEmpty() {
 		t.Error("non-breaking refactor/perf should not appear in public changes")
 	}
 	if len(v.Internal.Changed) != 2 {
@@ -106,7 +106,7 @@ func TestScaffold_AllSkippedCommits(t *testing.T) {
 	}
 	v := Scaffold(commits, ScaffoldOptions{})
 
-	if !v.Changes.IsEmpty() {
+	if !v.IsEmpty() {
 		t.Error("all skipped types should produce empty public changes")
 	}
 	if !v.Internal.IsEmpty() {
@@ -126,17 +126,17 @@ func TestScaffold_MixedCommitTypes(t *testing.T) {
 	}
 	v := Scaffold(commits, ScaffoldOptions{})
 
-	if len(v.Changes.Added) != 1 {
-		t.Errorf("added = %d, want 1", len(v.Changes.Added))
+	if len(v.Added) != 1 {
+		t.Errorf("added = %d, want 1", len(v.Added))
 	}
-	if len(v.Changes.Fixed) != 1 {
-		t.Errorf("fixed = %d, want 1", len(v.Changes.Fixed))
+	if len(v.Fixed) != 1 {
+		t.Errorf("fixed = %d, want 1", len(v.Fixed))
 	}
-	if len(v.Changes.Deprecated) != 1 {
-		t.Errorf("deprecated = %d, want 1", len(v.Changes.Deprecated))
+	if len(v.Deprecated) != 1 {
+		t.Errorf("deprecated = %d, want 1", len(v.Deprecated))
 	}
-	if len(v.Changes.Removed) != 1 {
-		t.Errorf("removed = %d, want 1", len(v.Changes.Removed))
+	if len(v.Removed) != 1 {
+		t.Errorf("removed = %d, want 1", len(v.Removed))
 	}
 	if len(v.Internal.Changed) != 1 {
 		t.Errorf("internal changed = %d, want 1", len(v.Internal.Changed))

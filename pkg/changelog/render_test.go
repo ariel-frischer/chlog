@@ -8,7 +8,7 @@ import (
 func TestRenderVersionMarkdown_Unreleased(t *testing.T) {
 	v := &Version{
 		Version: "unreleased",
-		Changes: Changes{Added: []string{"New feature"}},
+		Added:   []string{"New feature"},
 	}
 	var b strings.Builder
 	if err := RenderVersionMarkdown(v, &b); err != nil {
@@ -31,10 +31,8 @@ func TestRenderVersionMarkdown_Released(t *testing.T) {
 	v := &Version{
 		Version: "1.0.0",
 		Date:    "2024-01-01",
-		Changes: Changes{
-			Added: []string{"Feature A"},
-			Fixed: []string{"Bug B"},
-		},
+		Added:   []string{"Feature A"},
+		Fixed:   []string{"Bug B"},
 	}
 	var b strings.Builder
 	if err := RenderVersionMarkdown(v, &b); err != nil {
@@ -60,7 +58,7 @@ func TestRenderVersionMarkdown_SkipsEmptyCategories(t *testing.T) {
 	v := &Version{
 		Version: "1.0.0",
 		Date:    "2024-01-01",
-		Changes: Changes{Fixed: []string{"Bug fix"}},
+		Fixed:   []string{"Bug fix"},
 	}
 	var b strings.Builder
 	if err := RenderVersionMarkdown(v, &b); err != nil {
@@ -83,7 +81,7 @@ func TestRenderMarkdownString(t *testing.T) {
 			{
 				Version: "1.0.0",
 				Date:    "2024-01-01",
-				Changes: Changes{Added: []string{"Initial release"}},
+				Added:   []string{"Initial release"},
 			},
 		},
 	}

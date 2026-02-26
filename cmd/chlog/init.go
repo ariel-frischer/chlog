@@ -38,9 +38,7 @@ func runInit(cmd *cobra.Command, args []string) error {
 		Versions: []changelog.Version{
 			{
 				Version: "unreleased",
-				Changes: changelog.Changes{
-					Added: []string{"Initial project setup"},
-				},
+				Added:   []string{"Initial project setup"},
 			},
 		},
 	}

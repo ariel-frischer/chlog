@@ -83,7 +83,7 @@ func (c *Changelog) GetEntryCount(opts ...QueryOptions) int {
 		if opt.IncludeInternal {
 			count += v.MergedChanges().Count()
 		} else {
-			count += v.Changes.Count()
+			count += v.Count()
 		}
 	}
 	return count
@@ -96,7 +96,7 @@ func (c *Changelog) HasUnreleased() bool {
 
 // flattenChanges converts a version's changes into a flat entry slice in canonical category order.
 func flattenChanges(v *Version, includeInternal bool) []Entry {
-	changes := v.Changes
+	changes := v.Changes()
 	if includeInternal {
 		changes = v.MergedChanges()
 	}

@@ -59,7 +59,7 @@ func RenderVersionMarkdown(v *Version, w io.Writer, opts ...RenderOptions) error
 		fmt.Fprintf(w, "## [%s] - %s\n\n", v.Version, v.Date)
 	}
 
-	changes := v.Changes
+	changes := v.Changes()
 	if opt.IncludeInternal {
 		changes = v.MergedChanges()
 	}

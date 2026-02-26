@@ -30,9 +30,8 @@ func TestLoadFromReader_Valid(t *testing.T) {
 versions:
   - version: 1.0.0
     date: "2024-01-01"
-    changes:
-      added:
-        - Initial release
+    added:
+      - Initial release
 `
 	c, err := LoadFromReader(strings.NewReader(yaml))
 	if err != nil {
@@ -95,12 +94,10 @@ func TestValidate_EmptyUnreleasedAllowed(t *testing.T) {
 	yaml := `project: test
 versions:
   - version: unreleased
-    changes: {}
   - version: 1.0.0
     date: "2024-01-01"
-    changes:
-      added:
-        - Initial release
+    added:
+      - Initial release
 `
 	c, err := LoadFromReader(strings.NewReader(yaml))
 	if err != nil {
@@ -116,7 +113,6 @@ func TestValidate_EmptyReleasedRejected(t *testing.T) {
 versions:
   - version: 1.0.0
     date: "2024-01-01"
-    changes: {}
 `
 	_, err := LoadFromReader(strings.NewReader(yaml))
 	if err == nil {
@@ -153,7 +149,7 @@ func TestSave(t *testing.T) {
 			{
 				Version: "1.0.0",
 				Date:    "2024-01-01",
-				Changes: Changes{Added: []string{"Initial release"}},
+				Added:   []string{"Initial release"},
 			},
 		},
 	}

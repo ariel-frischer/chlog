@@ -34,14 +34,12 @@ func TestVersionNotFoundError_IsError(t *testing.T) {
 
 func TestMergedChanges_AllCategories(t *testing.T) {
 	v := &Version{
-		Changes: Changes{
-			Added:      []string{"pub-add"},
-			Changed:    []string{"pub-change"},
-			Deprecated: []string{"pub-dep"},
-			Removed:    []string{"pub-rem"},
-			Fixed:      []string{"pub-fix"},
-			Security:   []string{"pub-sec"},
-		},
+		Added:      []string{"pub-add"},
+		Changed:    []string{"pub-change"},
+		Deprecated: []string{"pub-dep"},
+		Removed:    []string{"pub-rem"},
+		Fixed:      []string{"pub-fix"},
+		Security:   []string{"pub-sec"},
 		Internal: Changes{
 			Added:      []string{"int-add"},
 			Changed:    []string{"int-change"},
@@ -78,7 +76,7 @@ func TestMergedChanges_AllCategories(t *testing.T) {
 
 func TestMergedChanges_EmptyInternals(t *testing.T) {
 	v := &Version{
-		Changes:  Changes{Added: []string{"a", "b"}},
+		Added:    []string{"a", "b"},
 		Internal: Changes{},
 	}
 	merged := v.MergedChanges()
@@ -89,7 +87,6 @@ func TestMergedChanges_EmptyInternals(t *testing.T) {
 
 func TestMergedChanges_EmptyPublic(t *testing.T) {
 	v := &Version{
-		Changes:  Changes{},
 		Internal: Changes{Fixed: []string{"internal fix"}},
 	}
 	merged := v.MergedChanges()
