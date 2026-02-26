@@ -7,6 +7,9 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+// DefaultCategories are the standard Keep a Changelog categories.
+var DefaultCategories = []string{"added", "changed", "deprecated", "removed", "fixed", "security"}
+
 // Changelog is the root structure for a YAML changelog file.
 type Changelog struct {
 	Project  string    `yaml:"project"`
@@ -113,66 +116,218 @@ func versionKeyNode(version string) *yaml.Node {
 	return node
 }
 
+// CategoryEntry holds entries for a single changelog category.
+type CategoryEntry struct {
+	Name    string
+	Entries []string
+}
+
+// Changes is an ordered collection of changelog categories.
+type Changes struct {
+	Categories []CategoryEntry
+}
+
+// Get returns the entries for a category, or nil if not found.
+func (c Changes) Get(category string) []string {
+	for _, cat := range c.Categories {
+		if cat.Name == category {
+			return cat.Entries
+		}
+	}
+	return nil
+}
+
+// Append adds an entry to a category, creating the category if needed.
+func (c *Changes) Append(category, entry string) {
+	for i := range c.Categories {
+		if c.Categories[i].Name == category {
+			c.Categories[i].Entries = append(c.Categories[i].Entries, entry)
+			return
+		}
+	}
+	c.Categories = append(c.Categories, CategoryEntry{Name: category, Entries: []string{entry}})
+}
+
+// Merge appends all entries from other into c, preserving order.
+func (c *Changes) Merge(other Changes) {
+	for _, cat := range other.Categories {
+		for _, entry := range cat.Entries {
+			c.Append(cat.Name, entry)
+		}
+	}
+}
+
+// Clone returns a deep copy of the Changes.
+func (c Changes) Clone() Changes {
+	clone := Changes{Categories: make([]CategoryEntry, len(c.Categories))}
+	for i, cat := range c.Categories {
+		entries := make([]string, len(cat.Entries))
+		copy(entries, cat.Entries)
+		clone.Categories[i] = CategoryEntry{Name: cat.Name, Entries: entries}
+	}
+	return clone
+}
+
+// IsEmpty returns true if there are no entries in any category.
+func (c Changes) IsEmpty() bool {
+	return c.Count() == 0
+}
+
+// Count returns the total number of entries across all categories.
+func (c Changes) Count() int {
+	n := 0
+	for _, cat := range c.Categories {
+		n += len(cat.Entries)
+	}
+	return n
+}
+
+// CategoryNames returns the names of all categories in order.
+func (c Changes) CategoryNames() []string {
+	names := make([]string, len(c.Categories))
+	for i, cat := range c.Categories {
+		names[i] = cat.Name
+	}
+	return names
+}
+
+// UnmarshalYAML parses a YAML mapping where each key is a category name.
+func (c *Changes) UnmarshalYAML(value *yaml.Node) error {
+	if value.Kind != yaml.MappingNode {
+		return fmt.Errorf("changes: expected mapping, got %d", value.Kind)
+	}
+	for i := 0; i < len(value.Content)-1; i += 2 {
+		key := value.Content[i].Value
+		var entries []string
+		if err := value.Content[i+1].Decode(&entries); err != nil {
+			return fmt.Errorf("changes.%s: %w", key, err)
+		}
+		c.Categories = append(c.Categories, CategoryEntry{Name: key, Entries: entries})
+	}
+	return nil
+}
+
+// MarshalYAML emits a YAML mapping with each category as a key.
+func (c Changes) MarshalYAML() (interface{}, error) {
+	node := &yaml.Node{Kind: yaml.MappingNode}
+	for _, cat := range c.Categories {
+		if len(cat.Entries) == 0 {
+			continue
+		}
+		var entriesNode yaml.Node
+		if err := entriesNode.Encode(cat.Entries); err != nil {
+			return nil, fmt.Errorf("encoding %s: %w", cat.Name, err)
+		}
+		node.Content = append(node.Content,
+			&yaml.Node{Kind: yaml.ScalarNode, Value: cat.Name},
+			&entriesNode,
+		)
+	}
+	return node, nil
+}
+
 // Version represents a single version entry in the changelog.
 type Version struct {
-	Version    string   `yaml:"-"`
-	Date       string   `yaml:"date,omitempty"`
-	Added      []string `yaml:"added,omitempty"`
-	Changed    []string `yaml:"changed,omitempty"`
-	Deprecated []string `yaml:"deprecated,omitempty"`
-	Removed    []string `yaml:"removed,omitempty"`
-	Fixed      []string `yaml:"fixed,omitempty"`
-	Security   []string `yaml:"security,omitempty"`
-	Internal   Changes  `yaml:"internal,omitempty"`
+	Version  string  `yaml:"-"`
+	Date     string  `yaml:"-"`
+	Public   Changes `yaml:"-"`
+	Internal Changes `yaml:"-"`
 }
 
-// Changes returns a Changes value built from the version's direct category fields.
-func (v *Version) Changes() Changes {
-	return Changes{
-		Added:      v.Added,
-		Changed:    v.Changed,
-		Deprecated: v.Deprecated,
-		Removed:    v.Removed,
-		Fixed:      v.Fixed,
-		Security:   v.Security,
-	}
-}
-
-// MergedChanges returns Changes with internal entries merged in.
+// MergedChanges returns Changes with internal entries merged into a clone of public.
 func (v *Version) MergedChanges() Changes {
-	return Changes{
-		Added:      append(append([]string{}, v.Added...), v.Internal.Added...),
-		Changed:    append(append([]string{}, v.Changed...), v.Internal.Changed...),
-		Deprecated: append(append([]string{}, v.Deprecated...), v.Internal.Deprecated...),
-		Removed:    append(append([]string{}, v.Removed...), v.Internal.Removed...),
-		Fixed:      append(append([]string{}, v.Fixed...), v.Internal.Fixed...),
-		Security:   append(append([]string{}, v.Security...), v.Internal.Security...),
-	}
+	merged := v.Public.Clone()
+	merged.Merge(v.Internal)
+	return merged
 }
 
-// IsEmpty returns true if all category lists on this version are empty.
+// IsEmpty returns true if all public category lists are empty.
 func (v *Version) IsEmpty() bool {
-	return v.Changes().IsEmpty()
+	return v.Public.IsEmpty()
 }
 
-// Count returns the total number of entries across all categories on this version.
+// Count returns the total number of public entries.
 func (v *Version) Count() int {
-	return v.Changes().Count()
+	return v.Public.Count()
 }
 
-// CategoryEntries returns the entries for a given category name on this version.
-func (v *Version) CategoryEntries(category string) []string {
-	return v.Changes().CategoryEntries(category)
+// IsUnreleased returns true if this version represents unreleased changes.
+func (v *Version) IsUnreleased() bool {
+	return strings.EqualFold(v.Version, "unreleased")
 }
 
-// Changes groups entries by Keep a Changelog categories.
-type Changes struct {
-	Added      []string `yaml:"added,omitempty"`
-	Changed    []string `yaml:"changed,omitempty"`
-	Deprecated []string `yaml:"deprecated,omitempty"`
-	Removed    []string `yaml:"removed,omitempty"`
-	Fixed      []string `yaml:"fixed,omitempty"`
-	Security   []string `yaml:"security,omitempty"`
+// UnmarshalYAML parses a version node where "date" and "internal" are special keys,
+// and everything else is a public category.
+func (v *Version) UnmarshalYAML(value *yaml.Node) error {
+	if value.Kind != yaml.MappingNode {
+		return fmt.Errorf("version: expected mapping, got %d", value.Kind)
+	}
+
+	for i := 0; i < len(value.Content)-1; i += 2 {
+		key := value.Content[i].Value
+		val := value.Content[i+1]
+
+		switch key {
+		case "date":
+			v.Date = val.Value
+		case "internal":
+			if err := val.Decode(&v.Internal); err != nil {
+				return fmt.Errorf("version.internal: %w", err)
+			}
+		default:
+			// Everything else is a public category
+			var entries []string
+			if err := val.Decode(&entries); err != nil {
+				return fmt.Errorf("version.%s: %w", key, err)
+			}
+			v.Public.Categories = append(v.Public.Categories, CategoryEntry{
+				Name:    key,
+				Entries: entries,
+			})
+		}
+	}
+	return nil
+}
+
+// MarshalYAML emits date, then public categories, then internal if non-empty.
+func (v Version) MarshalYAML() (interface{}, error) {
+	node := &yaml.Node{Kind: yaml.MappingNode}
+
+	if v.Date != "" {
+		node.Content = append(node.Content,
+			&yaml.Node{Kind: yaml.ScalarNode, Value: "date"},
+			&yaml.Node{Kind: yaml.ScalarNode, Value: v.Date},
+		)
+	}
+
+	// Public categories
+	for _, cat := range v.Public.Categories {
+		if len(cat.Entries) == 0 {
+			continue
+		}
+		var entriesNode yaml.Node
+		if err := entriesNode.Encode(cat.Entries); err != nil {
+			return nil, fmt.Errorf("encoding %s: %w", cat.Name, err)
+		}
+		node.Content = append(node.Content,
+			&yaml.Node{Kind: yaml.ScalarNode, Value: cat.Name},
+			&entriesNode,
+		)
+	}
+
+	// Internal
+	if !v.Internal.IsEmpty() {
+		var internalNode yaml.Node
+		if err := internalNode.Encode(v.Internal); err != nil {
+			return nil, fmt.Errorf("encoding internal: %w", err)
+		}
+		node.Content = append(node.Content,
+			&yaml.Node{Kind: yaml.ScalarNode, Value: "internal"},
+			&internalNode,
+		)
+	}
+
+	return node, nil
 }
 
 // Entry is a flattened view of a single changelog entry with metadata.
@@ -199,45 +354,4 @@ type VersionNotFoundError struct {
 
 func (e VersionNotFoundError) Error() string {
 	return fmt.Sprintf("version %q not found", e.Version)
-}
-
-// IsUnreleased returns true if this version represents unreleased changes.
-func (v *Version) IsUnreleased() bool {
-	return strings.EqualFold(v.Version, "unreleased")
-}
-
-// IsEmpty returns true if all category lists are empty.
-func (c Changes) IsEmpty() bool {
-	return c.Count() == 0
-}
-
-// Count returns the total number of entries across all categories.
-func (c Changes) Count() int {
-	return len(c.Added) + len(c.Changed) + len(c.Deprecated) +
-		len(c.Removed) + len(c.Fixed) + len(c.Security)
-}
-
-// ValidCategories returns category names in canonical order.
-func ValidCategories() []string {
-	return []string{"added", "changed", "deprecated", "removed", "fixed", "security"}
-}
-
-// CategoryEntries returns the entries for a given category name.
-func (c Changes) CategoryEntries(category string) []string {
-	switch category {
-	case "added":
-		return c.Added
-	case "changed":
-		return c.Changed
-	case "deprecated":
-		return c.Deprecated
-	case "removed":
-		return c.Removed
-	case "fixed":
-		return c.Fixed
-	case "security":
-		return c.Security
-	default:
-		return nil
-	}
 }

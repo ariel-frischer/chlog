@@ -83,47 +83,13 @@ func Scaffold(commits []GitCommit, opts ScaffoldOptions) *Version {
 			continue
 		}
 		if isInternal {
-			appendToCategory(&v.Internal, cat, desc)
+			v.Internal.Append(cat, desc)
 		} else {
-			appendToVersion(v, cat, desc)
+			v.Public.Append(cat, desc)
 		}
 	}
 
 	return v
-}
-
-func appendToVersion(v *Version, category, entry string) {
-	switch category {
-	case "added":
-		v.Added = append(v.Added, entry)
-	case "changed":
-		v.Changed = append(v.Changed, entry)
-	case "deprecated":
-		v.Deprecated = append(v.Deprecated, entry)
-	case "removed":
-		v.Removed = append(v.Removed, entry)
-	case "fixed":
-		v.Fixed = append(v.Fixed, entry)
-	case "security":
-		v.Security = append(v.Security, entry)
-	}
-}
-
-func appendToCategory(c *Changes, category, entry string) {
-	switch category {
-	case "added":
-		c.Added = append(c.Added, entry)
-	case "changed":
-		c.Changed = append(c.Changed, entry)
-	case "deprecated":
-		c.Deprecated = append(c.Deprecated, entry)
-	case "removed":
-		c.Removed = append(c.Removed, entry)
-	case "fixed":
-		c.Fixed = append(c.Fixed, entry)
-	case "security":
-		c.Security = append(c.Security, entry)
-	}
 }
 
 func cleanDescription(s string) string {

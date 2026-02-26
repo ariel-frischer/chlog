@@ -53,28 +53,28 @@ func TestCleanDescription(t *testing.T) {
 	}
 }
 
-func TestAppendToCategory(t *testing.T) {
+func TestChanges_Append_NewAndExisting(t *testing.T) {
 	tests := map[string]struct {
 		category string
 		entry    string
 		check    func(*Changes) bool
 	}{
-		"added":      {category: "added", entry: "x", check: func(c *Changes) bool { return len(c.Added) == 1 && c.Added[0] == "x" }},
-		"changed":    {category: "changed", entry: "x", check: func(c *Changes) bool { return len(c.Changed) == 1 }},
-		"deprecated": {category: "deprecated", entry: "x", check: func(c *Changes) bool { return len(c.Deprecated) == 1 }},
-		"removed":    {category: "removed", entry: "x", check: func(c *Changes) bool { return len(c.Removed) == 1 }},
-		"fixed":      {category: "fixed", entry: "x", check: func(c *Changes) bool { return len(c.Fixed) == 1 }},
-		"security":   {category: "security", entry: "x", check: func(c *Changes) bool { return len(c.Security) == 1 }},
-		"unknown": {category: "bogus", entry: "x", check: func(c *Changes) bool {
-			return c.IsEmpty()
+		"added":      {category: "added", entry: "x", check: func(c *Changes) bool { return len(c.Get("added")) == 1 && c.Get("added")[0] == "x" }},
+		"changed":    {category: "changed", entry: "x", check: func(c *Changes) bool { return len(c.Get("changed")) == 1 }},
+		"deprecated": {category: "deprecated", entry: "x", check: func(c *Changes) bool { return len(c.Get("deprecated")) == 1 }},
+		"removed":    {category: "removed", entry: "x", check: func(c *Changes) bool { return len(c.Get("removed")) == 1 }},
+		"fixed":      {category: "fixed", entry: "x", check: func(c *Changes) bool { return len(c.Get("fixed")) == 1 }},
+		"security":   {category: "security", entry: "x", check: func(c *Changes) bool { return len(c.Get("security")) == 1 }},
+		"custom": {category: "performance", entry: "x", check: func(c *Changes) bool {
+			return len(c.Get("performance")) == 1
 		}},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
 			c := &Changes{}
-			appendToCategory(c, tc.category, tc.entry)
+			c.Append(tc.category, tc.entry)
 			if !tc.check(c) {
-				t.Errorf("appendToCategory(%q) did not produce expected result", tc.category)
+				t.Errorf("Append(%q) did not produce expected result", tc.category)
 			}
 		})
 	}
@@ -90,8 +90,8 @@ func TestScaffold_InternalNonBreakingRefactorAndPerf(t *testing.T) {
 	if !v.IsEmpty() {
 		t.Error("non-breaking refactor/perf should not appear in public changes")
 	}
-	if len(v.Internal.Changed) != 2 {
-		t.Errorf("internal changed = %d, want 2", len(v.Internal.Changed))
+	if len(v.Internal.Get("changed")) != 2 {
+		t.Errorf("internal changed = %d, want 2", len(v.Internal.Get("changed")))
 	}
 }
 
@@ -126,20 +126,20 @@ func TestScaffold_MixedCommitTypes(t *testing.T) {
 	}
 	v := Scaffold(commits, ScaffoldOptions{})
 
-	if len(v.Added) != 1 {
-		t.Errorf("added = %d, want 1", len(v.Added))
+	if len(v.Public.Get("added")) != 1 {
+		t.Errorf("added = %d, want 1", len(v.Public.Get("added")))
 	}
-	if len(v.Fixed) != 1 {
-		t.Errorf("fixed = %d, want 1", len(v.Fixed))
+	if len(v.Public.Get("fixed")) != 1 {
+		t.Errorf("fixed = %d, want 1", len(v.Public.Get("fixed")))
 	}
-	if len(v.Deprecated) != 1 {
-		t.Errorf("deprecated = %d, want 1", len(v.Deprecated))
+	if len(v.Public.Get("deprecated")) != 1 {
+		t.Errorf("deprecated = %d, want 1", len(v.Public.Get("deprecated")))
 	}
-	if len(v.Removed) != 1 {
-		t.Errorf("removed = %d, want 1", len(v.Removed))
+	if len(v.Public.Get("removed")) != 1 {
+		t.Errorf("removed = %d, want 1", len(v.Public.Get("removed")))
 	}
-	if len(v.Internal.Changed) != 1 {
-		t.Errorf("internal changed = %d, want 1", len(v.Internal.Changed))
+	if len(v.Internal.Get("changed")) != 1 {
+		t.Errorf("internal changed = %d, want 1", len(v.Internal.Get("changed")))
 	}
 }
 

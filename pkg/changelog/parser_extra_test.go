@@ -17,7 +17,7 @@ versions:
 `
 	_, err := LoadFromReader(strings.NewReader(yaml))
 	if err == nil {
-		t.Fatal("expected error for unknown field (KnownFields enabled)")
+		t.Fatal("expected error for unknown field")
 	}
 }
 
@@ -39,11 +39,11 @@ func TestValidate_WhitespaceOnlyProject(t *testing.T) {
 }
 
 func TestValidate_EmptyVersionString(t *testing.T) {
+	v := Version{Version: "", Date: "2024-01-01"}
+	v.Public.Append("added", "x")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{Version: "", Date: "2024-01-01", Added: []string{"x"}},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	errs := Validate(c)
 	if len(errs) == 0 {
@@ -61,11 +61,11 @@ func TestValidate_EmptyVersionString(t *testing.T) {
 }
 
 func TestValidate_DateMissing(t *testing.T) {
+	v := Version{Version: "1.0.0"}
+	v.Public.Append("added", "x")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{Version: "1.0.0", Added: []string{"x"}},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	errs := Validate(c)
 	found := false
@@ -91,12 +91,13 @@ func TestValidate_NoVersions(t *testing.T) {
 }
 
 func TestValidate_MultipleErrors(t *testing.T) {
+	v1 := Version{Version: "1.0.0", Date: "not-a-date"}
+	v1.Public.Append("added", "x")
+	v2 := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v2.Public.Append("added", "y")
 	c := &Changelog{
-		Project: "",
-		Versions: []Version{
-			{Version: "1.0.0", Date: "not-a-date", Added: []string{"x"}},
-			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"y"}},
-		},
+		Project:  "",
+		Versions: []Version{v1, v2},
 	}
 	errs := Validate(c)
 	if len(errs) < 3 {
@@ -105,22 +106,19 @@ func TestValidate_MultipleErrors(t *testing.T) {
 }
 
 func TestSave_RoundTrip(t *testing.T) {
+	unreleased := Version{Version: "unreleased"}
+	unreleased.Public.Append("added", "WIP feature")
+
+	released := Version{Version: "1.0.0", Date: "2024-01-01"}
+	released.Public.Append("added", "Feature A")
+	released.Public.Append("added", "Feature B")
+	released.Public.Append("fixed", "Bug fix")
+	released.Public.Append("security", "CVE patch")
+	released.Internal.Append("changed", "Refactored handler")
+
 	original := &Changelog{
-		Project: "roundtrip-test",
-		Versions: []Version{
-			{
-				Version: "unreleased",
-				Added:   []string{"WIP feature"},
-			},
-			{
-				Version:  "1.0.0",
-				Date:     "2024-01-01",
-				Added:    []string{"Feature A", "Feature B"},
-				Fixed:    []string{"Bug fix"},
-				Security: []string{"CVE patch"},
-				Internal: Changes{Changed: []string{"Refactored handler"}},
-			},
-		},
+		Project:  "roundtrip-test",
+		Versions: []Version{unreleased, released},
 	}
 
 	path := t.TempDir() + "/roundtrip.yaml"
@@ -143,7 +141,7 @@ func TestSave_RoundTrip(t *testing.T) {
 		t.Errorf("entry count mismatch: got %d, want %d",
 			loaded.Versions[1].Count(), original.Versions[1].Count())
 	}
-	if len(loaded.Versions[1].Internal.Changed) != 1 {
+	if len(loaded.Versions[1].Internal.Get("changed")) != 1 {
 		t.Error("internal changes not preserved in round-trip")
 	}
 }
@@ -204,5 +202,45 @@ func TestLoadConfig_InvalidYAML(t *testing.T) {
 	_, err := LoadConfig(path)
 	if err == nil {
 		t.Fatal("expected error for invalid YAML config")
+	}
+}
+
+func TestValidate_CustomCategories(t *testing.T) {
+	v := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("performance", "Improved query speed")
+	c := &Changelog{
+		Project:  "test",
+		Versions: []Version{v},
+	}
+
+	// Default strict mode should reject "performance"
+	errs := Validate(c)
+	found := false
+	for _, e := range errs {
+		if strings.Contains(e.Message, `unknown category "performance"`) {
+			found = true
+		}
+	}
+	if !found {
+		t.Error("expected unknown category error in strict mode")
+	}
+
+	// With custom categories including "performance"
+	cfg := &Config{Categories: []string{"performance", "added"}}
+	errs = Validate(c, cfg)
+	for _, e := range errs {
+		if strings.Contains(e.Message, "unknown category") {
+			t.Errorf("unexpected unknown category error with custom config: %v", e)
+		}
+	}
+
+	// Non-strict mode accepts anything
+	strictFalse := false
+	cfg2 := &Config{StrictCategories: &strictFalse}
+	errs = Validate(c, cfg2)
+	for _, e := range errs {
+		if strings.Contains(e.Message, "unknown category") {
+			t.Errorf("unexpected unknown category error in non-strict mode: %v", e)
+		}
 	}
 }

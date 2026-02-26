@@ -34,40 +34,36 @@ func TestVersionNotFoundError_IsError(t *testing.T) {
 
 func TestMergedChanges_AllCategories(t *testing.T) {
 	v := &Version{
-		Added:      []string{"pub-add"},
-		Changed:    []string{"pub-change"},
-		Deprecated: []string{"pub-dep"},
-		Removed:    []string{"pub-rem"},
-		Fixed:      []string{"pub-fix"},
-		Security:   []string{"pub-sec"},
-		Internal: Changes{
-			Added:      []string{"int-add"},
-			Changed:    []string{"int-change"},
-			Deprecated: []string{"int-dep"},
-			Removed:    []string{"int-rem"},
-			Fixed:      []string{"int-fix"},
-			Security:   []string{"int-sec"},
-		},
+		Public: makeChangesMulti(map[string][]string{
+			"added": {"pub-add"}, "changed": {"pub-change"},
+			"deprecated": {"pub-dep"}, "removed": {"pub-rem"},
+			"fixed": {"pub-fix"}, "security": {"pub-sec"},
+		}),
+		Internal: makeChangesMulti(map[string][]string{
+			"added": {"int-add"}, "changed": {"int-change"},
+			"deprecated": {"int-dep"}, "removed": {"int-rem"},
+			"fixed": {"int-fix"}, "security": {"int-sec"},
+		}),
 	}
 	merged := v.MergedChanges()
 
-	if len(merged.Added) != 2 {
-		t.Errorf("Added = %d, want 2", len(merged.Added))
+	if len(merged.Get("added")) != 2 {
+		t.Errorf("Added = %d, want 2", len(merged.Get("added")))
 	}
-	if len(merged.Changed) != 2 {
-		t.Errorf("Changed = %d, want 2", len(merged.Changed))
+	if len(merged.Get("changed")) != 2 {
+		t.Errorf("Changed = %d, want 2", len(merged.Get("changed")))
 	}
-	if len(merged.Deprecated) != 2 {
-		t.Errorf("Deprecated = %d, want 2", len(merged.Deprecated))
+	if len(merged.Get("deprecated")) != 2 {
+		t.Errorf("Deprecated = %d, want 2", len(merged.Get("deprecated")))
 	}
-	if len(merged.Removed) != 2 {
-		t.Errorf("Removed = %d, want 2", len(merged.Removed))
+	if len(merged.Get("removed")) != 2 {
+		t.Errorf("Removed = %d, want 2", len(merged.Get("removed")))
 	}
-	if len(merged.Fixed) != 2 {
-		t.Errorf("Fixed = %d, want 2", len(merged.Fixed))
+	if len(merged.Get("fixed")) != 2 {
+		t.Errorf("Fixed = %d, want 2", len(merged.Get("fixed")))
 	}
-	if len(merged.Security) != 2 {
-		t.Errorf("Security = %d, want 2", len(merged.Security))
+	if len(merged.Get("security")) != 2 {
+		t.Errorf("Security = %d, want 2", len(merged.Get("security")))
 	}
 	if merged.Count() != 12 {
 		t.Errorf("Count() = %d, want 12", merged.Count())
@@ -76,38 +72,34 @@ func TestMergedChanges_AllCategories(t *testing.T) {
 
 func TestMergedChanges_EmptyInternals(t *testing.T) {
 	v := &Version{
-		Added:    []string{"a", "b"},
-		Internal: Changes{},
+		Public: makeChangesMulti(map[string][]string{"added": {"a", "b"}}),
 	}
 	merged := v.MergedChanges()
-	if len(merged.Added) != 2 {
-		t.Errorf("Added = %d, want 2 (internal empty)", len(merged.Added))
+	if len(merged.Get("added")) != 2 {
+		t.Errorf("Added = %d, want 2 (internal empty)", len(merged.Get("added")))
 	}
 }
 
 func TestMergedChanges_EmptyPublic(t *testing.T) {
 	v := &Version{
-		Internal: Changes{Fixed: []string{"internal fix"}},
+		Internal: makeChanges("fixed", "internal fix"),
 	}
 	merged := v.MergedChanges()
-	if len(merged.Fixed) != 1 {
-		t.Errorf("Fixed = %d, want 1 (public empty)", len(merged.Fixed))
+	if len(merged.Get("fixed")) != 1 {
+		t.Errorf("Fixed = %d, want 1 (public empty)", len(merged.Get("fixed")))
 	}
 }
 
-func TestChanges_CategoryEntries_AllCategories(t *testing.T) {
-	c := Changes{
-		Added:      []string{"a"},
-		Changed:    []string{"b"},
-		Deprecated: []string{"c"},
-		Removed:    []string{"d"},
-		Fixed:      []string{"e"},
-		Security:   []string{"f"},
-	}
-	for _, cat := range ValidCategories() {
-		entries := c.CategoryEntries(cat)
+func TestChanges_Get_AllCategories(t *testing.T) {
+	c := makeChangesMulti(map[string][]string{
+		"added": {"a"}, "changed": {"b"},
+		"deprecated": {"c"}, "removed": {"d"},
+		"fixed": {"e"}, "security": {"f"},
+	})
+	for _, cat := range DefaultCategories {
+		entries := c.Get(cat)
 		if len(entries) != 1 {
-			t.Errorf("CategoryEntries(%q) = %d, want 1", cat, len(entries))
+			t.Errorf("Get(%q) = %d, want 1", cat, len(entries))
 		}
 	}
 }
@@ -119,5 +111,42 @@ func TestVersion_IsUnreleased_MixedCase(t *testing.T) {
 		if !v.IsUnreleased() {
 			t.Errorf("IsUnreleased(%q) = false, want true", version)
 		}
+	}
+}
+
+func TestChanges_Append(t *testing.T) {
+	var c Changes
+	c.Append("added", "first")
+	c.Append("added", "second")
+	c.Append("fixed", "bug")
+
+	if len(c.Get("added")) != 2 {
+		t.Errorf("added = %d, want 2", len(c.Get("added")))
+	}
+	if len(c.Get("fixed")) != 1 {
+		t.Errorf("fixed = %d, want 1", len(c.Get("fixed")))
+	}
+}
+
+func TestChanges_Clone(t *testing.T) {
+	orig := makeChanges("added", "x")
+	clone := orig.Clone()
+	clone.Append("added", "y")
+
+	if len(orig.Get("added")) != 1 {
+		t.Error("Clone mutated original")
+	}
+	if len(clone.Get("added")) != 2 {
+		t.Error("Clone didn't append")
+	}
+}
+
+func TestChanges_CategoryNames(t *testing.T) {
+	c := makeChangesMulti(map[string][]string{
+		"added": {"a"}, "fixed": {"b"},
+	})
+	names := c.CategoryNames()
+	if len(names) != 2 {
+		t.Fatalf("CategoryNames() = %d, want 2", len(names))
 	}
 }

@@ -59,18 +59,17 @@ func RenderVersionMarkdown(v *Version, w io.Writer, opts ...RenderOptions) error
 		fmt.Fprintf(w, "## [%s] - %s\n\n", v.Version, v.Date)
 	}
 
-	changes := v.Changes()
+	changes := v.Public
 	if opt.IncludeInternal {
 		changes = v.MergedChanges()
 	}
 
-	for _, cat := range ValidCategories() {
-		entries := changes.CategoryEntries(cat)
-		if len(entries) == 0 {
+	for _, cat := range changes.Categories {
+		if len(cat.Entries) == 0 {
 			continue
 		}
-		fmt.Fprintf(w, "### %s\n\n", titleCase(cat))
-		for _, entry := range entries {
+		fmt.Fprintf(w, "### %s\n\n", titleCase(cat.Name))
+		for _, entry := range cat.Entries {
 			fmt.Fprintf(w, "- %s\n", entry)
 		}
 		fmt.Fprintln(w)

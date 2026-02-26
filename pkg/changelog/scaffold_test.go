@@ -130,14 +130,14 @@ func TestScaffold(t *testing.T) {
 	if v.Version != "unreleased" {
 		t.Errorf("version = %q, want unreleased", v.Version)
 	}
-	if len(v.Added) != 1 {
-		t.Errorf("added count = %d, want 1", len(v.Added))
+	if len(v.Public.Get("added")) != 1 {
+		t.Errorf("added count = %d, want 1", len(v.Public.Get("added")))
 	}
-	if len(v.Fixed) != 1 {
-		t.Errorf("fixed count = %d, want 1", len(v.Fixed))
+	if len(v.Public.Get("fixed")) != 1 {
+		t.Errorf("fixed count = %d, want 1", len(v.Public.Get("fixed")))
 	}
-	if len(v.Changed) != 1 {
-		t.Errorf("changed count = %d, want 1 (breaking refactor)", len(v.Changed))
+	if len(v.Public.Get("changed")) != 1 {
+		t.Errorf("changed count = %d, want 1 (breaking refactor)", len(v.Public.Get("changed")))
 	}
 }
 

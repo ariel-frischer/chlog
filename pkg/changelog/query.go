@@ -94,18 +94,18 @@ func (c *Changelog) HasUnreleased() bool {
 	return c.GetUnreleased() != nil
 }
 
-// flattenChanges converts a version's changes into a flat entry slice in canonical category order.
+// flattenChanges converts a version's changes into a flat entry slice.
 func flattenChanges(v *Version, includeInternal bool) []Entry {
-	changes := v.Changes()
+	changes := v.Public
 	if includeInternal {
 		changes = v.MergedChanges()
 	}
 	var entries []Entry
-	for _, cat := range ValidCategories() {
-		for _, text := range changes.CategoryEntries(cat) {
+	for _, cat := range changes.Categories {
+		for _, text := range cat.Entries {
 			entries = append(entries, Entry{
 				Text:     text,
-				Category: cat,
+				Category: cat.Name,
 				Version:  v.Version,
 			})
 		}

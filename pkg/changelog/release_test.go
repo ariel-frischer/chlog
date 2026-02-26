@@ -10,69 +10,65 @@ func TestRelease(t *testing.T) {
 		wantErr   string
 	}{
 		"basic release": {
-			changelog: &Changelog{
-				Project: "test",
-				Versions: []Version{
-					{Version: "unreleased", Added: []string{"New feature"}},
-					{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Init"}},
-				},
-			},
+			changelog: func() *Changelog {
+				v := Version{Version: "unreleased"}
+				v.Public.Append("added", "New feature")
+				v2 := Version{Version: "1.0.0", Date: "2024-01-01"}
+				v2.Public.Append("added", "Init")
+				return &Changelog{Project: "test", Versions: []Version{v, v2}}
+			}(),
 			version: "2.0.0",
 			date:    "2024-06-01",
 		},
 		"no unreleased": {
-			changelog: &Changelog{
-				Project: "test",
-				Versions: []Version{
-					{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Init"}},
-				},
-			},
+			changelog: func() *Changelog {
+				v := Version{Version: "1.0.0", Date: "2024-01-01"}
+				v.Public.Append("added", "Init")
+				return &Changelog{Project: "test", Versions: []Version{v}}
+			}(),
 			version: "2.0.0",
 			date:    "2024-06-01",
 			wantErr: "no unreleased version found",
 		},
 		"empty unreleased": {
 			changelog: &Changelog{
-				Project: "test",
-				Versions: []Version{
-					{Version: "unreleased"},
-				},
+				Project:  "test",
+				Versions: []Version{{Version: "unreleased"}},
 			},
 			version: "1.0.0",
 			date:    "2024-06-01",
 			wantErr: "unreleased version has no entries",
 		},
 		"duplicate version": {
-			changelog: &Changelog{
-				Project: "test",
-				Versions: []Version{
-					{Version: "unreleased", Fixed: []string{"Bug fix"}},
-					{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Init"}},
-				},
-			},
+			changelog: func() *Changelog {
+				v := Version{Version: "unreleased"}
+				v.Public.Append("fixed", "Bug fix")
+				v2 := Version{Version: "1.0.0", Date: "2024-01-01"}
+				v2.Public.Append("added", "Init")
+				return &Changelog{Project: "test", Versions: []Version{v, v2}}
+			}(),
 			version: "1.0.0",
 			date:    "2024-06-01",
 			wantErr: `version "1.0.0" already exists`,
 		},
 		"duplicate version with v prefix": {
-			changelog: &Changelog{
-				Project: "test",
-				Versions: []Version{
-					{Version: "unreleased", Fixed: []string{"Bug fix"}},
-					{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Init"}},
-				},
-			},
+			changelog: func() *Changelog {
+				v := Version{Version: "unreleased"}
+				v.Public.Append("fixed", "Bug fix")
+				v2 := Version{Version: "1.0.0", Date: "2024-01-01"}
+				v2.Public.Append("added", "Init")
+				return &Changelog{Project: "test", Versions: []Version{v, v2}}
+			}(),
 			version: "v1.0.0",
 			date:    "2024-06-01",
 			wantErr: `version "v1.0.0" already exists`,
 		},
 		"internal only entries": {
-			changelog: &Changelog{
-				Project: "test",
-				Versions: []Version{
-					{Version: "unreleased", Internal: Changes{Changed: []string{"Refactored internals"}}},
-				},
-			},
+			changelog: func() *Changelog {
+				v := Version{Version: "unreleased"}
+				v.Internal.Append("changed", "Refactored internals")
+				return &Changelog{Project: "test", Versions: []Version{v}}
+			}(),
 			version: "1.0.0",
 			date:    "2024-06-01",
 		},
@@ -117,13 +113,17 @@ func TestRelease(t *testing.T) {
 }
 
 func TestRelease_PreservesExistingVersions(t *testing.T) {
+	unreleased := Version{Version: "unreleased"}
+	unreleased.Public.Append("added", "Feature A")
+	unreleased.Public.Append("added", "Feature B")
+	v11 := Version{Version: "1.1.0", Date: "2024-03-01"}
+	v11.Public.Append("fixed", "Bug")
+	v10 := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v10.Public.Append("added", "Init")
+
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{Version: "unreleased", Added: []string{"Feature A", "Feature B"}},
-			{Version: "1.1.0", Date: "2024-03-01", Fixed: []string{"Bug"}},
-			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Init"}},
-		},
+		Project:  "test",
+		Versions: []Version{unreleased, v11, v10},
 	}
 
 	if err := c.Release("2.0.0", "2024-06-01"); err != nil {
@@ -143,7 +143,7 @@ func TestRelease_PreservesExistingVersions(t *testing.T) {
 
 	// Verify the released version kept its entries
 	released := c.Versions[1]
-	if len(released.Added) != 2 {
-		t.Errorf("released added = %d entries, want 2", len(released.Added))
+	if len(released.Public.Get("added")) != 2 {
+		t.Errorf("released added = %d entries, want 2", len(released.Public.Get("added")))
 	}
 }

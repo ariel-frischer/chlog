@@ -40,11 +40,24 @@ func LoadFromReader(r io.Reader) (*Changelog, error) {
 }
 
 // Validate checks a Changelog for structural and semantic errors.
-func Validate(c *Changelog) []ValidationError {
+// An optional Config can be passed to control category validation.
+func Validate(c *Changelog, cfg ...*Config) []ValidationError {
 	var errs []ValidationError
 
 	if strings.TrimSpace(c.Project) == "" {
 		errs = append(errs, ValidationError{Field: "project", Message: "must not be empty"})
+	}
+
+	var allowed []string
+	if len(cfg) > 0 && cfg[0] != nil {
+		allowed = cfg[0].AllowedCategories()
+	} else {
+		allowed = DefaultCategories
+	}
+
+	allowedSet := make(map[string]bool, len(allowed))
+	for _, cat := range allowed {
+		allowedSet[cat] = true
 	}
 
 	seen := map[string]bool{}
@@ -96,26 +109,36 @@ func Validate(c *Changelog) []ValidationError {
 			})
 		}
 
-		for _, cat := range ValidCategories() {
-			for j, entry := range v.CategoryEntries(cat) {
-				if strings.TrimSpace(entry) == "" {
-					errs = append(errs, ValidationError{
-						Field:   fmt.Sprintf("%s.%s[%d]", prefix, cat, j),
-						Message: "entry must not be empty",
-					})
-				}
-			}
-			for j, entry := range v.Internal.CategoryEntries(cat) {
-				if strings.TrimSpace(entry) == "" {
-					errs = append(errs, ValidationError{
-						Field:   fmt.Sprintf("%s.internal.%s[%d]", prefix, cat, j),
-						Message: "entry must not be empty",
-					})
-				}
+		// Validate public categories
+		errs = append(errs, validateChanges(v.Public, prefix, allowed, allowedSet)...)
+
+		// Validate internal categories
+		errs = append(errs, validateChanges(v.Internal, prefix+".internal", allowed, allowedSet)...)
+	}
+
+	return errs
+}
+
+// validateChanges checks entries within a Changes value.
+func validateChanges(changes Changes, prefix string, allowed []string, allowedSet map[string]bool) []ValidationError {
+	var errs []ValidationError
+	for _, cat := range changes.Categories {
+		// Check category is allowed (only when allowed is non-nil = strict mode)
+		if allowed != nil && !allowedSet[cat.Name] {
+			errs = append(errs, ValidationError{
+				Field:   prefix + "." + cat.Name,
+				Message: fmt.Sprintf("unknown category %q", cat.Name),
+			})
+		}
+		for j, entry := range cat.Entries {
+			if strings.TrimSpace(entry) == "" {
+				errs = append(errs, ValidationError{
+					Field:   fmt.Sprintf("%s.%s[%d]", prefix, cat.Name, j),
+					Message: "entry must not be empty",
+				})
 			}
 		}
 	}
-
 	return errs
 }
 

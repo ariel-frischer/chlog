@@ -28,6 +28,15 @@ var categoryStyles = map[string]categoryStyle{
 	"security":   {Icon: "🔒", Color: color.New(color.FgMagenta)},
 }
 
+var defaultStyle = categoryStyle{Icon: "*", Color: color.New(color.FgWhite)}
+
+func styleFor(category string) categoryStyle {
+	if s, ok := categoryStyles[category]; ok {
+		return s
+	}
+	return defaultStyle
+}
+
 // FormatTerminal formats the entire changelog for terminal output.
 func FormatTerminal(c *Changelog, opts FormatOptions) string {
 	if opts.MaxWidth == 0 {
@@ -66,19 +75,18 @@ func FormatVersion(v *Version, opts FormatOptions) string {
 		fmt.Fprintf(&b, "%s\n", bold.Sprint(header))
 	}
 
-	changes := v.Changes()
+	changes := v.Public
 	if opts.IncludeInternal {
 		changes = v.MergedChanges()
 	}
 
-	for _, cat := range ValidCategories() {
-		entries := changes.CategoryEntries(cat)
-		if len(entries) == 0 {
+	for _, cat := range changes.Categories {
+		if len(cat.Entries) == 0 {
 			continue
 		}
 
-		style := categoryStyles[cat]
-		catHeader := titleCase(cat)
+		style := styleFor(cat.Name)
+		catHeader := titleCase(cat.Name)
 
 		if opts.Plain {
 			fmt.Fprintf(&b, "  %s %s\n", style.Icon, catHeader)
@@ -86,7 +94,7 @@ func FormatVersion(v *Version, opts FormatOptions) string {
 			fmt.Fprintf(&b, "  %s\n", style.Color.Sprintf("%s %s", style.Icon, catHeader))
 		}
 
-		for _, entry := range entries {
+		for _, entry := range cat.Entries {
 			wrapped := wrapText(entry, opts.MaxWidth-6, "      ")
 			fmt.Fprintf(&b, "    - %s\n", wrapped)
 		}

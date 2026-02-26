@@ -83,12 +83,13 @@ func TestFormatVersionHeader(t *testing.T) {
 }
 
 func TestFormatTerminal_MultipleVersions(t *testing.T) {
+	unreleased := Version{Version: "unreleased"}
+	unreleased.Public.Append("added", "WIP")
+	released := Version{Version: "1.0.0", Date: "2024-01-01"}
+	released.Public.Append("added", "Init")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{Version: "unreleased", Added: []string{"WIP"}},
-			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Init"}},
-		},
+		Project:  "test",
+		Versions: []Version{unreleased, released},
 	}
 	out := FormatTerminal(c, FormatOptions{Plain: true})
 
@@ -107,11 +108,11 @@ func TestFormatTerminal_MultipleVersions(t *testing.T) {
 }
 
 func TestFormatTerminal_DefaultMaxWidth(t *testing.T) {
+	v := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "Feature")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Feature"}},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	// MaxWidth=0 should use default of 80
 	out := FormatTerminal(c, FormatOptions{Plain: true, MaxWidth: 0})
@@ -136,13 +137,10 @@ func TestFormatVersion_EmptyChanges(t *testing.T) {
 }
 
 func TestFormatVersion_CategoryOrder(t *testing.T) {
-	v := &Version{
-		Version:  "1.0.0",
-		Date:     "2024-01-01",
-		Security: []string{"Patched vuln"},
-		Added:    []string{"New thing"},
-		Fixed:    []string{"Bug fix"},
-	}
+	v := &Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "New thing")
+	v.Public.Append("fixed", "Bug fix")
+	v.Public.Append("security", "Patched vuln")
 	out := FormatVersion(v, FormatOptions{Plain: true})
 
 	addedIdx := strings.Index(out, "Added")
@@ -153,6 +151,19 @@ func TestFormatVersion_CategoryOrder(t *testing.T) {
 		t.Fatalf("missing categories in output:\n%s", out)
 	}
 	if addedIdx > fixedIdx || fixedIdx > secIdx {
-		t.Error("categories should appear in canonical order: added < fixed < security")
+		t.Error("categories should appear in order: added < fixed < security")
+	}
+}
+
+func TestFormatVersion_CustomCategory(t *testing.T) {
+	v := &Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("performance", "Improved query speed")
+	out := FormatVersion(v, FormatOptions{Plain: true})
+
+	if !strings.Contains(out, "* Performance") {
+		t.Errorf("expected default icon * for custom category, got:\n%s", out)
+	}
+	if !strings.Contains(out, "Improved query speed") {
+		t.Error("expected entry text")
 	}
 }

@@ -99,13 +99,16 @@ func TestRenderComparisonLinks_UnreleasedOnly(t *testing.T) {
 }
 
 func TestRenderMarkdown_WithComparisonLinks(t *testing.T) {
+	unreleased := Version{Version: "unreleased"}
+	unreleased.Public.Append("added", "WIP")
+	v2 := Version{Version: "2.0.0", Date: "2024-06-01"}
+	v2.Public.Append("added", "Feature")
+	v1 := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v1.Public.Append("added", "Init")
+
 	c := &Changelog{
-		Project: "test-project",
-		Versions: []Version{
-			{Version: "unreleased", Added: []string{"WIP"}},
-			{Version: "2.0.0", Date: "2024-06-01", Added: []string{"Feature"}},
-			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Init"}},
-		},
+		Project:  "test-project",
+		Versions: []Version{unreleased, v2, v1},
 	}
 	cfg := &Config{RepoURL: "https://github.com/org/repo"}
 	out, err := RenderMarkdownString(c, RenderOptions{Config: cfg})
@@ -125,11 +128,11 @@ func TestRenderMarkdown_WithComparisonLinks(t *testing.T) {
 }
 
 func TestRenderMarkdown_NoLinksWithoutConfig(t *testing.T) {
+	v := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "Init")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"Init"}},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	out, err := RenderMarkdownString(c)
 	if err != nil {
@@ -141,23 +144,21 @@ func TestRenderMarkdown_NoLinksWithoutConfig(t *testing.T) {
 }
 
 func TestRenderVersionMarkdown_AllCategories(t *testing.T) {
-	v := &Version{
-		Version:    "1.0.0",
-		Date:       "2024-01-01",
-		Added:      []string{"New thing"},
-		Changed:    []string{"Updated thing"},
-		Deprecated: []string{"Old thing"},
-		Removed:    []string{"Gone thing"},
-		Fixed:      []string{"Fixed thing"},
-		Security:   []string{"Secure thing"},
-	}
+	v := &Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "New thing")
+	v.Public.Append("changed", "Updated thing")
+	v.Public.Append("deprecated", "Old thing")
+	v.Public.Append("removed", "Gone thing")
+	v.Public.Append("fixed", "Fixed thing")
+	v.Public.Append("security", "Secure thing")
+
 	var b strings.Builder
 	if err := RenderVersionMarkdown(v, &b); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 	out := b.String()
 
-	// Verify canonical ordering
+	// Verify ordering matches append order (which is canonical)
 	categories := []string{"Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"}
 	lastIdx := -1
 	for _, cat := range categories {
@@ -167,7 +168,7 @@ func TestRenderVersionMarkdown_AllCategories(t *testing.T) {
 			continue
 		}
 		if idx < lastIdx {
-			t.Errorf("### %s appeared out of canonical order", cat)
+			t.Errorf("### %s appeared out of order", cat)
 		}
 		lastIdx = idx
 	}

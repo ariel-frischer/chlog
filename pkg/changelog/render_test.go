@@ -6,10 +6,8 @@ import (
 )
 
 func TestRenderVersionMarkdown_Unreleased(t *testing.T) {
-	v := &Version{
-		Version: "unreleased",
-		Added:   []string{"New feature"},
-	}
+	v := &Version{Version: "unreleased"}
+	v.Public.Append("added", "New feature")
 	var b strings.Builder
 	if err := RenderVersionMarkdown(v, &b); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -28,12 +26,9 @@ func TestRenderVersionMarkdown_Unreleased(t *testing.T) {
 }
 
 func TestRenderVersionMarkdown_Released(t *testing.T) {
-	v := &Version{
-		Version: "1.0.0",
-		Date:    "2024-01-01",
-		Added:   []string{"Feature A"},
-		Fixed:   []string{"Bug B"},
-	}
+	v := &Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "Feature A")
+	v.Public.Append("fixed", "Bug B")
 	var b strings.Builder
 	if err := RenderVersionMarkdown(v, &b); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -43,7 +38,7 @@ func TestRenderVersionMarkdown_Released(t *testing.T) {
 	if !strings.Contains(out, "## [1.0.0] - 2024-01-01") {
 		t.Error("expected version header with date")
 	}
-	// Added should come before Fixed (canonical order)
+	// Added should come before Fixed (order from YAML/Append)
 	addedIdx := strings.Index(out, "### Added")
 	fixedIdx := strings.Index(out, "### Fixed")
 	if addedIdx == -1 || fixedIdx == -1 {
@@ -55,11 +50,8 @@ func TestRenderVersionMarkdown_Released(t *testing.T) {
 }
 
 func TestRenderVersionMarkdown_SkipsEmptyCategories(t *testing.T) {
-	v := &Version{
-		Version: "1.0.0",
-		Date:    "2024-01-01",
-		Fixed:   []string{"Bug fix"},
-	}
+	v := &Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("fixed", "Bug fix")
 	var b strings.Builder
 	if err := RenderVersionMarkdown(v, &b); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -75,15 +67,11 @@ func TestRenderVersionMarkdown_SkipsEmptyCategories(t *testing.T) {
 }
 
 func TestRenderMarkdownString(t *testing.T) {
+	v := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "Initial release")
 	c := &Changelog{
-		Project: "test-project",
-		Versions: []Version{
-			{
-				Version: "1.0.0",
-				Date:    "2024-01-01",
-				Added:   []string{"Initial release"},
-			},
-		},
+		Project:  "test-project",
+		Versions: []Version{v},
 	}
 	out, err := RenderMarkdownString(c)
 	if err != nil {

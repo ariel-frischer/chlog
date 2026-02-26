@@ -143,15 +143,11 @@ func TestNormalizeVersion(t *testing.T) {
 }
 
 func TestSave(t *testing.T) {
+	v := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "Initial release")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{
-				Version: "1.0.0",
-				Date:    "2024-01-01",
-				Added:   []string{"Initial release"},
-			},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	path := t.TempDir() + "/out.yaml"
 	if err := Save(c, path); err != nil {

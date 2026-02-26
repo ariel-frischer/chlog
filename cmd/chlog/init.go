@@ -33,14 +33,11 @@ func runInit(cmd *cobra.Command, args []string) error {
 		name = promptProjectName()
 	}
 
+	initialVersion := changelog.Version{Version: "unreleased"}
+	initialVersion.Public.Append("added", "Initial project setup")
 	c := &changelog.Changelog{
-		Project: name,
-		Versions: []changelog.Version{
-			{
-				Version: "unreleased",
-				Added:   []string{"Initial project setup"},
-			},
-		},
+		Project:  name,
+		Versions: []changelog.Version{initialVersion},
 	}
 
 	if err := changelog.Save(c, yamlFile); err != nil {

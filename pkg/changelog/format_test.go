@@ -6,12 +6,9 @@ import (
 )
 
 func TestFormatVersion_Plain(t *testing.T) {
-	v := &Version{
-		Version: "1.0.0",
-		Date:    "2024-01-01",
-		Added:   []string{"Feature A"},
-		Fixed:   []string{"Bug B"},
-	}
+	v := &Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "Feature A")
+	v.Public.Append("fixed", "Bug B")
 	out := FormatVersion(v, FormatOptions{Plain: true})
 
 	if !strings.Contains(out, "[1.0.0] - 2024-01-01") {
@@ -29,10 +26,8 @@ func TestFormatVersion_Plain(t *testing.T) {
 }
 
 func TestFormatVersion_Unreleased(t *testing.T) {
-	v := &Version{
-		Version: "unreleased",
-		Added:   []string{"WIP"},
-	}
+	v := &Version{Version: "unreleased"}
+	v.Public.Append("added", "WIP")
 	out := FormatVersion(v, FormatOptions{Plain: true})
 	if !strings.Contains(out, "[Unreleased]") {
 		t.Error("expected [Unreleased] header")
@@ -40,15 +35,11 @@ func TestFormatVersion_Unreleased(t *testing.T) {
 }
 
 func TestFormatTerminal_Plain(t *testing.T) {
+	v := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v.Public.Append("added", "Init")
 	c := &Changelog{
-		Project: "myproject",
-		Versions: []Version{
-			{
-				Version: "1.0.0",
-				Date:    "2024-01-01",
-				Added:   []string{"Init"},
-			},
-		},
+		Project:  "myproject",
+		Versions: []Version{v},
 	}
 	out := FormatTerminal(c, FormatOptions{Plain: true})
 	if !strings.Contains(out, "myproject Changelog") {

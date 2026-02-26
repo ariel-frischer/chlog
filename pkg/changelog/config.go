@@ -15,10 +15,25 @@ const (
 
 // Config holds project-specific chlog settings.
 type Config struct {
-	RepoURL         string `yaml:"repo_url,omitempty"`
-	IncludeInternal bool   `yaml:"include_internal,omitempty"`
-	PublicFile      string `yaml:"public_file,omitempty"`
-	InternalFile    string `yaml:"internal_file,omitempty"`
+	RepoURL          string   `yaml:"repo_url,omitempty"`
+	IncludeInternal  bool     `yaml:"include_internal,omitempty"`
+	PublicFile       string   `yaml:"public_file,omitempty"`
+	InternalFile     string   `yaml:"internal_file,omitempty"`
+	Categories       []string `yaml:"categories,omitempty"`
+	StrictCategories *bool    `yaml:"strict_categories,omitempty"`
+}
+
+// AllowedCategories returns the category allowlist for validation.
+// Returns nil if non-strict (accept anything), the custom list if set,
+// or DefaultCategories as fallback.
+func (c *Config) AllowedCategories() []string {
+	if c.StrictCategories != nil && !*c.StrictCategories {
+		return nil
+	}
+	if len(c.Categories) > 0 {
+		return c.Categories
+	}
+	return DefaultCategories
 }
 
 // PublicFilePath returns PublicFile if set, otherwise the default.

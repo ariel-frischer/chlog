@@ -3,17 +3,16 @@ package changelog
 import "testing"
 
 func TestRelease_PreservesEntriesInPromotedVersion(t *testing.T) {
+	v := Version{Version: "unreleased"}
+	v.Public.Append("added", "Feature A")
+	v.Public.Append("added", "Feature B")
+	v.Public.Append("fixed", "Bug X")
+	v.Public.Append("changed", "API update")
+	v.Internal.Append("changed", "Refactored handler")
+
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{
-				Version:  "unreleased",
-				Added:    []string{"Feature A", "Feature B"},
-				Fixed:    []string{"Bug X"},
-				Changed:  []string{"API update"},
-				Internal: Changes{Changed: []string{"Refactored handler"}},
-			},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 
 	if err := c.Release("1.0.0", "2024-06-01"); err != nil {
@@ -21,26 +20,26 @@ func TestRelease_PreservesEntriesInPromotedVersion(t *testing.T) {
 	}
 
 	released := c.Versions[1]
-	if len(released.Added) != 2 {
-		t.Errorf("added = %d, want 2", len(released.Added))
+	if len(released.Public.Get("added")) != 2 {
+		t.Errorf("added = %d, want 2", len(released.Public.Get("added")))
 	}
-	if len(released.Fixed) != 1 {
-		t.Errorf("fixed = %d, want 1", len(released.Fixed))
+	if len(released.Public.Get("fixed")) != 1 {
+		t.Errorf("fixed = %d, want 1", len(released.Public.Get("fixed")))
 	}
-	if len(released.Changed) != 1 {
-		t.Errorf("changed = %d, want 1", len(released.Changed))
+	if len(released.Public.Get("changed")) != 1 {
+		t.Errorf("changed = %d, want 1", len(released.Public.Get("changed")))
 	}
-	if len(released.Internal.Changed) != 1 {
-		t.Errorf("internal changed = %d, want 1", len(released.Internal.Changed))
+	if len(released.Internal.Get("changed")) != 1 {
+		t.Errorf("internal changed = %d, want 1", len(released.Internal.Get("changed")))
 	}
 }
 
 func TestRelease_NewUnreleasedIsClean(t *testing.T) {
+	v := Version{Version: "unreleased"}
+	v.Public.Append("added", "x")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{Version: "unreleased", Added: []string{"x"}},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	if err := c.Release("1.0.0", "2024-01-01"); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -59,13 +58,16 @@ func TestRelease_NewUnreleasedIsClean(t *testing.T) {
 }
 
 func TestRelease_MultiplePreviousVersions(t *testing.T) {
+	unreleased := Version{Version: "unreleased"}
+	unreleased.Public.Append("added", "new")
+	v2 := Version{Version: "2.0.0", Date: "2024-06-01"}
+	v2.Public.Append("added", "v2")
+	v1 := Version{Version: "1.0.0", Date: "2024-01-01"}
+	v1.Public.Append("added", "v1")
+
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{Version: "unreleased", Added: []string{"new"}},
-			{Version: "2.0.0", Date: "2024-06-01", Added: []string{"v2"}},
-			{Version: "1.0.0", Date: "2024-01-01", Added: []string{"v1"}},
-		},
+		Project:  "test",
+		Versions: []Version{unreleased, v2, v1},
 	}
 	if err := c.Release("3.0.0", "2024-12-01"); err != nil {
 		t.Fatalf("unexpected error: %v", err)
@@ -84,11 +86,11 @@ func TestRelease_MultiplePreviousVersions(t *testing.T) {
 }
 
 func TestRelease_VersionIsCorrectlyStamped(t *testing.T) {
+	v := Version{Version: "unreleased"}
+	v.Public.Append("added", "feature")
 	c := &Changelog{
-		Project: "test",
-		Versions: []Version{
-			{Version: "unreleased", Added: []string{"feature"}},
-		},
+		Project:  "test",
+		Versions: []Version{v},
 	}
 	if err := c.Release("1.2.3", "2024-07-15"); err != nil {
 		t.Fatalf("unexpected error: %v", err)

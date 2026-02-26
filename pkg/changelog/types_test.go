@@ -29,8 +29,8 @@ func TestChanges_IsEmpty(t *testing.T) {
 		want    bool
 	}{
 		"empty":     {changes: Changes{}, want: true},
-		"has_added": {changes: Changes{Added: []string{"x"}}, want: false},
-		"has_fixed": {changes: Changes{Fixed: []string{"y"}}, want: false},
+		"has_added": {changes: makeChanges("added", "x"), want: false},
+		"has_fixed": {changes: makeChanges("fixed", "y"), want: false},
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
@@ -47,14 +47,14 @@ func TestChanges_Count(t *testing.T) {
 		want    int
 	}{
 		"empty":    {changes: Changes{}, want: 0},
-		"one":      {changes: Changes{Added: []string{"a"}}, want: 1},
-		"multiple": {changes: Changes{Added: []string{"a", "b"}, Fixed: []string{"c"}}, want: 3},
+		"one":      {changes: makeChanges("added", "a"), want: 1},
+		"multiple": {changes: makeChangesMulti(map[string][]string{"added": {"a", "b"}, "fixed": {"c"}}), want: 3},
 		"all_categories": {
-			changes: Changes{
-				Added: []string{"a"}, Changed: []string{"b"},
-				Deprecated: []string{"c"}, Removed: []string{"d"},
-				Fixed: []string{"e"}, Security: []string{"f"},
-			},
+			changes: makeChangesMulti(map[string][]string{
+				"added": {"a"}, "changed": {"b"},
+				"deprecated": {"c"}, "removed": {"d"},
+				"fixed": {"e"}, "security": {"f"},
+			}),
 			want: 6,
 		},
 	}
@@ -67,12 +67,10 @@ func TestChanges_Count(t *testing.T) {
 	}
 }
 
-func TestChanges_CategoryEntries(t *testing.T) {
-	c := Changes{
-		Added:   []string{"a"},
-		Fixed:   []string{"f"},
-		Changed: []string{"c"},
-	}
+func TestChanges_Get(t *testing.T) {
+	c := makeChangesMulti(map[string][]string{
+		"added": {"a"}, "fixed": {"f"}, "changed": {"c"},
+	})
 	tests := map[string]struct {
 		category string
 		wantLen  int
@@ -85,16 +83,16 @@ func TestChanges_CategoryEntries(t *testing.T) {
 	}
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			got := c.CategoryEntries(tc.category)
+			got := c.Get(tc.category)
 			if len(got) != tc.wantLen {
-				t.Errorf("CategoryEntries(%q) len = %d, want %d", tc.category, len(got), tc.wantLen)
+				t.Errorf("Get(%q) len = %d, want %d", tc.category, len(got), tc.wantLen)
 			}
 		})
 	}
 }
 
-func TestValidCategories(t *testing.T) {
-	cats := ValidCategories()
+func TestDefaultCategories(t *testing.T) {
+	cats := DefaultCategories
 	if len(cats) != 6 {
 		t.Fatalf("expected 6 categories, got %d", len(cats))
 	}
@@ -104,4 +102,35 @@ func TestValidCategories(t *testing.T) {
 			t.Errorf("category[%d] = %q, want %q", i, cat, expected[i])
 		}
 	}
+}
+
+// makeChanges creates a Changes with a single category and single entry.
+func makeChanges(category, entry string) Changes {
+	return Changes{Categories: []CategoryEntry{{Name: category, Entries: []string{entry}}}}
+}
+
+// makeChangesMulti creates a Changes from a map. Order follows DefaultCategories for known
+// categories, then any unknown in map iteration order.
+func makeChangesMulti(m map[string][]string) Changes {
+	var c Changes
+	// First, add in default order for deterministic output
+	for _, cat := range DefaultCategories {
+		if entries, ok := m[cat]; ok {
+			c.Categories = append(c.Categories, CategoryEntry{Name: cat, Entries: entries})
+		}
+	}
+	// Then any non-default categories
+	for cat, entries := range m {
+		found := false
+		for _, dc := range DefaultCategories {
+			if cat == dc {
+				found = true
+				break
+			}
+		}
+		if !found {
+			c.Categories = append(c.Categories, CategoryEntry{Name: cat, Entries: entries})
+		}
+	}
+	return c
 }
