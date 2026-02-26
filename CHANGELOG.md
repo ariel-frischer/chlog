@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+
+- CHANGELOG.yaml schema uses map-keyed versions instead of list format for less nesting and boilerplate
+
 ## [0.0.4] - 2026-02-26
 
 ### Added

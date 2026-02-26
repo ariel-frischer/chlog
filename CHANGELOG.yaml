@@ -1,6 +1,8 @@
 project: chlog
 versions:
-    unreleased: {}
+    unreleased:
+        changed:
+            - "CHANGELOG.yaml schema uses map-keyed versions instead of list format for less nesting and boilerplate"
 
     "0.0.4":
         date: "2026-02-26"
