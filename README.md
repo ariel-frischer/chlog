@@ -182,6 +182,48 @@ c, err = changelog.LoadFromReader(reader)
 
 See the [package documentation](https://pkg.go.dev/github.com/ariel-frischer/chlog/pkg/changelog) for the full API.
 
+## Shell Completion
+
+chlog includes built-in shell completions for all commands and flags.
+
+**Bash:**
+
+```bash
+# Current session
+source <(chlog completion bash)
+
+# Persistent (Linux)
+chlog completion bash > /etc/bash_completion.d/chlog
+
+# Persistent (macOS)
+chlog completion bash > $(brew --prefix)/etc/bash_completion.d/chlog
+```
+
+**Zsh:**
+
+```bash
+# Current session
+source <(chlog completion zsh)
+
+# Persistent (Linux)
+chlog completion zsh > "${fpath[1]}/_chlog"
+
+# Persistent (macOS)
+chlog completion zsh > $(brew --prefix)/share/zsh/site-functions/_chlog
+```
+
+**Fish:**
+
+```bash
+chlog completion fish > ~/.config/fish/completions/chlog.fish
+```
+
+**PowerShell:**
+
+```powershell
+chlog completion powershell | Out-String | Invoke-Expression
+```
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
@@ -189,3 +231,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
 ## License
 
 [MIT](LICENSE)
+
+---
+
+If you find `chlog` useful, consider giving it a ⭐ on [GitHub](https://github.com/ariel-frischer/chlog). It helps others discover the project.
