@@ -54,7 +54,7 @@ versions:
     internal:                   # Excluded by default, use --internal
       changed:
         - "Refactored auth"
-  "1.0.0":
+  1.0.0:
     date: "2024-01-01"         # Required for released versions
     added: []
     changed: []

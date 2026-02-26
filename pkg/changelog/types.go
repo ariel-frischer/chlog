@@ -67,7 +67,7 @@ func (c Changelog) MarshalYAML() (interface{}, error) {
 	// versions key
 	versionsMap := &yaml.Node{Kind: yaml.MappingNode}
 	for _, v := range c.Versions {
-		keyNode := &yaml.Node{Kind: yaml.ScalarNode, Value: v.Version, Tag: "!!str"}
+		keyNode := versionKeyNode(v.Version)
 
 		var valNode yaml.Node
 		if err := valNode.Encode(v); err != nil {
@@ -89,7 +89,7 @@ func (c Changelog) MarshalYAML() (interface{}, error) {
 func MarshalVersionEntry(v *Version) ([]byte, error) {
 	wrapper := &yaml.Node{Kind: yaml.MappingNode}
 
-	keyNode := &yaml.Node{Kind: yaml.ScalarNode, Value: v.Version, Tag: "!!str"}
+	keyNode := versionKeyNode(v.Version)
 	var valNode yaml.Node
 	if err := valNode.Encode(*v); err != nil {
 		return nil, fmt.Errorf("encoding version %s: %w", v.Version, err)
@@ -97,6 +97,20 @@ func MarshalVersionEntry(v *Version) ([]byte, error) {
 	wrapper.Content = append(wrapper.Content, keyNode, &valNode)
 
 	return yaml.Marshal(wrapper)
+}
+
+// versionKeyNode creates a YAML scalar node for a version key.
+// Only forces !!str tag when the value would be misinterpreted by YAML
+// (e.g. "1.0" as float, "1" as int, "true" as bool).
+func versionKeyNode(version string) *yaml.Node {
+	node := &yaml.Node{Kind: yaml.ScalarNode, Value: version}
+	var parsed interface{}
+	if err := yaml.Unmarshal([]byte(version), &parsed); err == nil {
+		if _, ok := parsed.(string); !ok {
+			node.Tag = "!!str"
+		}
+	}
+	return node
 }
 
 // Version represents a single version entry in the changelog.

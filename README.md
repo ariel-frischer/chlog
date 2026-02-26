@@ -87,7 +87,7 @@ versions:
       changed:
         - "Refactored auth middleware"
 
-  "0.1.0":
+  0.1.0:
     date: "2026-02-24"
     added:
       - "Initial release"

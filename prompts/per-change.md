@@ -35,7 +35,7 @@ CHANGELOG.yaml schema:
         removed: []
         fixed: []
         security: []
-    "1.0.0":
+    1.0.0:
       date: "2026-01-15"             # Required for released versions
       added:
         - "Initial release"

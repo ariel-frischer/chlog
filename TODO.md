@@ -50,7 +50,7 @@ added:
 
 ```yaml
 versions:
-  "1.0.0":
+  1.0.0:
     date: "2024-03-15"
     changes:
       added:

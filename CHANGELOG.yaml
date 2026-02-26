@@ -2,21 +2,19 @@ project: chlog
 versions:
     unreleased:
         changed:
-            - "CHANGELOG.yaml schema uses map-keyed versions instead of list format for less nesting and boilerplate"
-
-    "0.0.4":
+            - CHANGELOG.yaml schema uses map-keyed versions instead of list format for less nesting and boilerplate
+    0.0.4:
         date: "2026-02-26"
         added:
             - Version command with build info display
             - ASCII branding for CLI
             - Production CI workflow
             - Open source GitHub release preparation (LICENSE, .goreleaser config)
-
-    "0.0.3":
+    0.0.3:
         date: "2026-02-25"
         added:
             - Support for internal changelog entries (excluded from public CHANGELOG.md)
-            - "`chlog release` command to promote unreleased changes to a versioned release"
+            - '`chlog release` command to promote unreleased changes to a versioned release'
             - Configuration section and `.chlog.yaml` file support
             - Tests for config loading and repo URL resolution
         changed:
@@ -24,8 +22,7 @@ versions:
         fixed:
             - Include config loading in check command for proper validation
             - Allow empty unreleased versions while enforcing non-empty released versions
-
-    "0.0.2":
+    0.0.2:
         date: "2026-02-25"
         added:
             - Core CLI with init, check, extract, sync, validate, and show commands
@@ -34,8 +31,7 @@ versions:
             - Terminal output with colors and icons
         changed:
             - Makefile install target alias and go-install target for streamlined dependency management
-
-    "0.0.1":
+    0.0.1:
         date: "2026-02-24"
         added:
             - Initial project scaffolding (Go module, directory structure, Makefile)

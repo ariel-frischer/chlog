@@ -1,6 +1,6 @@
 project: test-project
 versions:
-  "1.0.0":
+  1.0.0:
     date: "2024-01-01"
     added:
       - ""
