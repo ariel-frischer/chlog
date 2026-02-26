@@ -33,6 +33,6 @@ changelog:
   disable: true
 
 release:
-  gitlab:
+  github:
     owner: ariel-frischer
     name: chlog

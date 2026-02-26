@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/spf13/cobra"
-	"gitlab.com/ariel-frischer/chlog/pkg/changelog"
+	"github.com/ariel-frischer/chlog/pkg/changelog"
 )
 
 const (

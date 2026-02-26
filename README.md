@@ -1,13 +1,33 @@
 # chlog
 
+[![CI](https://github.com/ariel-frischer/chlog/actions/workflows/ci.yml/badge.svg)](https://github.com/ariel-frischer/chlog/actions/workflows/ci.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ariel-frischer/chlog)](https://goreportcard.com/report/github.com/ariel-frischer/chlog)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+
 Language-agnostic CLI for YAML-first changelog management.
 
 Single `CHANGELOG.yaml` source of truth → auto-generated `CHANGELOG.md` → CI validation.
 
 ## Install
 
+**Quick install** (Linux/macOS):
+
 ```bash
-go install gitlab.com/ariel-frischer/chlog@latest
+curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/install.sh | sh
+```
+
+**Go install**:
+
+```bash
+go install github.com/ariel-frischer/chlog@latest
+```
+
+**From source**:
+
+```bash
+git clone https://github.com/ariel-frischer/chlog.git
+cd chlog
+make build    # Binary at bin/chlog
 ```
 
 ## Quickstart
@@ -36,7 +56,7 @@ Commit-based changelog tools (git-cliff, semantic-release) dump git logs. That's
 
 ```
 # git log (what tools like git-cliff give you)
-a]4f2c1 fix: adjust retry backoff timing
+a4f2c1 fix: adjust retry backoff timing
 b92e0a refactor: extract http client helper
 c7d31b fix: handle nil pointer in auth middleware
 d1a8ef feat: add timeout flag
@@ -91,7 +111,7 @@ Scaffold auto-classifies `refactor`/`perf` commits as internal.
 Optional `.chlog.yaml` in your project root:
 
 ```yaml
-repo_url: https://gitlab.com/myorg/myproject
+repo_url: https://github.com/myorg/myproject
 ```
 
 The `repo_url` is used for version comparison links in `CHANGELOG.md`. If omitted, chlog auto-detects from `git remote origin`.
@@ -113,7 +133,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-      - run: go install gitlab.com/ariel-frischer/chlog@latest
+      - run: go install github.com/ariel-frischer/chlog@latest
       - run: chlog validate
       - run: chlog check
 ```
@@ -125,5 +145,13 @@ Exit codes: `0` in sync, `1` out of sync, `2` validation error.
 Importable as a Go library:
 
 ```go
-import "gitlab.com/ariel-frischer/chlog/pkg/changelog"
+import "github.com/ariel-frischer/chlog/pkg/changelog"
 ```
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines.
+
+## License
+
+[MIT](LICENSE)
