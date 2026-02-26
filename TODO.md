@@ -19,6 +19,8 @@
 - [x] `chlog extract <version>` — Output single version as markdown (for `gh release create --notes-file`)
 - [x] `chlog show [version]` — Terminal display with `--last N` and `--plain` flags
 - [x] `chlog scaffold` — Auto-scaffold YAML block from conventional commits since last tag
+- [x] `chlog add` — Add entries to changelog via CLI (supports multiple entries, internal, version targeting)
+- [x] `chlog remove` — Remove entries from changelog via CLI (exact or substring match)
 
 ## Scaffold System (pm-style)
 
@@ -80,6 +82,19 @@ versions:
 - [x] GitHub Actions example in README
 - [x] `chlog check` exit codes (0 = in sync, 1 = out of sync, 2 = validation error)
 - [x] goreleaser config for cross-platform binaries
+
+## Entry Management
+
+- [x] `chlog add -c <category> "entry"` — Add entries to changelog via CLI
+- [x] `chlog remove -c <category> "entry"` — Remove entries from changelog via CLI
+- [x] `Changes.Remove()` method with exact and substring matching
+- [x] Auto-create unreleased block on `add` if missing
+- [x] Category validation against config allowlist
+- [x] `--version` flag to target specific versions
+- [x] `--internal` flag for internal entries
+- [x] `--match` flag for case-insensitive substring removal
+- [x] Multiple match detection with helpful error messages
+- [x] Empty category cleanup after removal
 
 ## Stretch
 

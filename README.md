@@ -34,6 +34,11 @@ chlog show                          # View changelog in terminal
 chlog show 0.3.0                    # View specific version
 chlog show --last 5                 # View last 5 entries
 chlog extract 0.3.0                 # Output release notes (for gh release)
+chlog add -c added "New feature"    # Add entry to unreleased
+chlog add -c fixed -v 1.2.0 "Fix"  # Add to specific version
+chlog add -c changed -i "Refactor" # Add as internal entry
+chlog remove -c added "New feature" # Remove exact entry
+chlog remove -c added -m "feat"    # Remove by substring match
 chlog scaffold                      # Auto-scaffold from conventional commits
 chlog scaffold --write              # Scaffold and merge into CHANGELOG.yaml
 chlog scaffold --version 1.2.0      # Scaffold with explicit version string
@@ -66,7 +71,7 @@ fixed:
 
 Two workflows — use one or both:
 
-**Per-change** — agent adds a changelog entry as part of each feature or fix. Install the [SKILL.md](#ai-agent-skill) so your agent knows the YAML schema and commands, then include "update CHANGELOG.yaml" in your task prompt. The agent writes the entry inline while the context is fresh.
+**Per-change** — agent adds a changelog entry as part of each feature or fix. Install the [SKILL.md](#ai-agent-skill) so your agent knows the YAML schema and commands, then include "update CHANGELOG.yaml" in your task prompt. The agent can use `chlog add -c added "Description"` or edit the YAML directly — either works.
 
 **At release time** — agent reviews all commits since the last release, groups them into user-facing summaries, and writes the YAML. `chlog scaffold --write` gives it a starting point from conventional commits, then the agent curates.
 
@@ -184,6 +189,8 @@ entries := c.GetLastN(5)
 // Access categories
 added := latest.Public.Get("added")       // []string
 latest.Public.Append("fixed", "Bug fix")  // add entry
+latest.Public.Remove("fixed", "Bug fix", false)  // remove entry (exact match)
+latest.Public.Remove("fixed", "bug", true)       // remove entry (substring match)
 
 // Programmatic release
 c.Release("2.0.0", "2024-06-01")

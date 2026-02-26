@@ -20,6 +20,8 @@ Keep entries concise — one line each, no implementation details in the public 
 Commands:
 
   chlog scaffold --write          # Auto-scaffold from conventional commits
+  chlog add -c added "Feature"    # Add entry to unreleased
+  chlog remove -c added "Feature" # Remove an entry
   chlog validate                  # Check YAML schema is valid
   chlog sync                      # Regenerate CHANGELOG.md
   chlog check                     # Verify markdown matches YAML

@@ -11,6 +11,12 @@ the `unreleased` version. Place user-facing entries directly on the version
 perf, or implementation details.
 
 Write entries as concise, user-facing descriptions (not commit messages).
+You can add entries via CLI or by editing YAML directly:
+
+  chlog add -c added "New feature"          # Add to unreleased
+  chlog add -c changed -i "Refactored X"    # Add internal entry
+  chlog remove -c added "Reverted feature"  # Remove an entry
+
 After editing, validate and sync:
 
   chlog validate        # Check YAML schema is valid

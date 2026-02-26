@@ -18,7 +18,7 @@ make fmt            # Format code
 ```
 cmd/chlog/          # CLI entry point (cobra)
 pkg/changelog/      # Library (importable by other Go projects)
-  types.go          # Changelog, Version, Changes structs
+  types.go          # Changelog, Version, Changes structs + Remove method + error types
   parser.go         # YAML loading + validation
   query.go          # Query methods (GetVersion, GetLastN, etc.)
   render.go         # CHANGELOG.md generation

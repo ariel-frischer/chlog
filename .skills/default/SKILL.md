@@ -3,7 +3,7 @@ name: chlog
 description: >
   YAML-first changelog management CLI. Use when creating, updating, validating,
   or rendering changelogs. Covers init, sync, check, show, extract, scaffold,
-  release commands, internal entries, and CHANGELOG.yaml schema.
+  release, add, remove commands, internal entries, and CHANGELOG.yaml schema.
 license: MIT
 compatibility:
   - Claude Code
@@ -35,6 +35,14 @@ chlog show 1.2.0                # Single version
 chlog show --last 5             # Last N entries
 chlog show --plain              # No ANSI
 chlog extract 1.0.0             # Markdown for one version (pipe to gh release)
+chlog add -c added "Feature"    # Add entry to unreleased
+chlog add -c fixed -v 1.0.0 "Fix" # Add to specific version
+chlog add -c changed -i "Refactor" # Add as internal entry
+chlog add -c added "A" "B"     # Add multiple entries at once
+chlog remove -c added "Feature" # Remove exact entry from unreleased
+chlog remove -c added -m "feat" # Remove by substring match
+chlog remove -c fixed -v 1.0.0 "Fix" # Remove from specific version
+chlog remove -c changed -i "Refactor" # Remove internal entry
 chlog scaffold                  # Dry-run: conventional commits → YAML
 chlog scaffold --write          # Merge into CHANGELOG.yaml
 chlog release 1.0.0             # Promote unreleased → 1.0.0 (today's date)
@@ -110,6 +118,7 @@ c, _ := changelog.Load("CHANGELOG.yaml")
 v, _ := c.GetVersion("1.0.0")
 entries := v.Public.Get("added")       // []string
 v.Public.Append("fixed", "Bug fix")   // add entry
+v.Public.Remove("fixed", "Bug fix", false) // remove entry
 md, _ := changelog.RenderMarkdownString(c)
 c.Release("2.0.0", "2024-06-01")
 changelog.Save(c, "CHANGELOG.yaml")

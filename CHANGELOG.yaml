@@ -3,15 +3,22 @@ versions:
     unreleased:
         changed:
             - CHANGELOG.yaml schema uses map-keyed versions instead of list format for less nesting and boilerplate
+        added:
+            - Custom changelog categories with configurable allowlist and strict/non-strict validation modes
+            - '`chlog add` command for adding entries from the CLI with category validation, version targeting, and internal entry support'
+            - '`chlog remove` command for removing entries with exact or substring matching and empty category cleanup'
+        internal:
+            changed:
+                - Replaced fixed-field Changes struct with ordered CategoryEntry slice for dynamic category support
     0.0.4:
-        date: "2026-02-26"
+        date: 2026-02-26
         added:
             - Version command with build info display
             - ASCII branding for CLI
             - Production CI workflow
             - Open source GitHub release preparation (LICENSE, .goreleaser config)
     0.0.3:
-        date: "2026-02-25"
+        date: 2026-02-25
         added:
             - Support for internal changelog entries (excluded from public CHANGELOG.md)
             - '`chlog release` command to promote unreleased changes to a versioned release'
@@ -23,7 +30,7 @@ versions:
             - Include config loading in check command for proper validation
             - Allow empty unreleased versions while enforcing non-empty released versions
     0.0.2:
-        date: "2026-02-25"
+        date: 2026-02-25
         added:
             - Core CLI with init, check, extract, sync, validate, and show commands
             - YAML-based changelog parsing and validation
@@ -32,7 +39,7 @@ versions:
         changed:
             - Makefile install target alias and go-install target for streamlined dependency management
     0.0.1:
-        date: "2026-02-24"
+        date: 2026-02-24
         added:
             - Initial project scaffolding (Go module, directory structure, Makefile)
         fixed:

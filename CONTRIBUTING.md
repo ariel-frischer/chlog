@@ -26,7 +26,7 @@ make fmt       # Format code
 1. Fork the repo and create your branch from `main`
 2. Add tests for any new functionality
 3. Ensure `make test` and `make lint` pass
-4. Update `CHANGELOG.yaml` with your changes (use `chlog scaffold --write` for a head start)
+4. Update `CHANGELOG.yaml` with your changes (`chlog add -c added "Description"` or `chlog scaffold --write`)
 5. Run `chlog sync` to regenerate `CHANGELOG.md`
 
 ## Reporting Issues
