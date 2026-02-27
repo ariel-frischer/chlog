@@ -1,6 +1,8 @@
 project: chlog
 versions:
-    unreleased:
+    unreleased: {}
+    0.2.0:
+        date: 2026-02-26
         added:
             - Color-coded CLI output — success (green), warning (yellow), error (red) messages across all commands
             - Semantic color helpers for versions (magenta bold), file paths (cyan), categories (per-type colors)

@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-02-26
+
 ### Added
 
 - Color-coded CLI output — success (green), warning (yellow), error (red) messages across all commands
@@ -88,7 +90,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 - Use correct gitlab.com module path instead of github.com
 
-[Unreleased]: https://github.com/ariel-frischer/chlog/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/ariel-frischer/chlog/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/ariel-frischer/chlog/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/ariel-frischer/chlog/compare/v0.0.4...v0.1.0
 [0.0.4]: https://github.com/ariel-frischer/chlog/compare/v0.0.3...v0.0.4
 [0.0.3]: https://github.com/ariel-frischer/chlog/compare/v0.0.2...v0.0.3
