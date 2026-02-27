@@ -1,6 +1,23 @@
 project: chlog
 versions:
-    unreleased: {}
+    unreleased:
+        added:
+            - Color-coded CLI output — success (green), warning (yellow), error (red) messages across all commands
+            - Semantic color helpers for versions (magenta bold), file paths (cyan), categories (per-type colors)
+            - '`--no-color` global flag to disable colored output'
+            - Colorized version headers in `chlog show` with styled version, date, and delimiters
+            - Demo GIFs for basic and advanced usage in assets/
+        changed:
+            - Extracted UI formatting logic into dedicated `ui.go` for cleaner command code
+            - '`chlog show --last` uses colored version/category refs unless `--plain` is set'
+        fixed:
+            - Version header formatting in changelog terminal output
+            - goreleaser uses replace mode to overwrite existing releases
+            - CI cleans build artifacts before goreleaser to prevent dirty git state
+        internal:
+            changed:
+                - Simplified release script by removing GitHub push commands
+                - README updated with demo GIFs and advanced commands section
     0.1.0:
         date: 2026-02-26
         changed:
