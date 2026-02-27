@@ -8,15 +8,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [0.1.0] - 2026-02-26
 
-### Changed
-
-- CHANGELOG.yaml schema uses map-keyed versions instead of list format for less nesting and boilerplate
-
 ### Added
 
 - Custom changelog categories with configurable allowlist and strict/non-strict validation modes
 - `chlog add` command for adding entries from the CLI with category validation, version targeting, and internal entry support
 - `chlog remove` command for removing entries with exact or substring matching and empty category cleanup
+
+### Changed
+
+- CHANGELOG.yaml schema uses map-keyed versions instead of list format for less nesting and boilerplate
 
 ## [0.0.4] - 2026-02-26
 

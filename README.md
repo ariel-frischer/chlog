@@ -25,23 +25,44 @@ curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/install.s
 ## Quickstart
 
 ```bash
+chlog init                          # Create CHANGELOG.yaml + .chlog.yaml
+chlog add -c added "New feature"    # Add entry to unreleased
+chlog add -c fixed "Bug fix"        # Add a fix
+chlog sync                          # Generate CHANGELOG.md from YAML
+chlog release 1.0.0                 # Promote unreleased → 1.0.0
+```
+
+## Commands
+
+```bash
+# Setup
 chlog init                          # Create CHANGELOG.yaml + .chlog.yaml (auto-detects repo URL)
 chlog init --project myapp          # Skip project name prompt
-chlog sync                          # Generate CHANGELOG.md from YAML
-chlog check                         # CI gate — verify markdown matches YAML
-chlog validate                      # Validate YAML schema
-chlog show                          # View changelog in terminal
-chlog show 0.3.0                    # View specific version
-chlog show --last 5                 # View last 5 entries
-chlog extract 0.3.0                 # Output release notes (for gh release)
+
+# Add & remove entries
 chlog add -c added "New feature"    # Add entry to unreleased
 chlog add -c fixed -v 1.2.0 "Fix"  # Add to specific version
 chlog add -c changed -i "Refactor" # Add as internal entry
 chlog remove -c added "New feature" # Remove exact entry
 chlog remove -c added -m "feat"    # Remove by substring match
+
+# Generate & validate
+chlog sync                          # Generate CHANGELOG.md from YAML
+chlog check                         # CI gate — verify markdown matches YAML
+chlog validate                      # Validate YAML schema
+
+# View & extract
+chlog show                          # View changelog in terminal
+chlog show 0.3.0                    # View specific version
+chlog show --last 5                 # View last 5 entries
+chlog extract 0.3.0                 # Output release notes (for gh release)
+
+# Scaffold from commits
 chlog scaffold                      # Auto-scaffold from conventional commits
 chlog scaffold --write              # Scaffold and merge into CHANGELOG.yaml
 chlog scaffold --version 1.2.0      # Scaffold with explicit version string
+
+# Release
 chlog release 1.0.0                 # Promote unreleased → 1.0.0 with today's date
 chlog release 1.0.0 --date 2026-03-01  # Promote with explicit date
 ```
