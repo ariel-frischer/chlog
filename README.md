@@ -30,9 +30,9 @@ curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/install.s
 
 ```bash
 chlog init                          # Create CHANGELOG.yaml + .chlog.yaml
-chlog add -c added "New feature"    # Add entry to unreleased
-chlog add -c fixed "Bug fix"        # Add a fix
-chlog sync                          # Generate CHANGELOG.md from YAML
+chlog add added "New feature"       # Add entry to unreleased
+chlog add fixed "Bug fix"           # Add a fix
+chlog sync                          # Generate CHANGELOG.md (public only)
 chlog release 1.0.0                 # Promote unreleased → 1.0.0
 ```
 
@@ -44,14 +44,14 @@ chlog init                          # Create CHANGELOG.yaml + .chlog.yaml (auto-
 chlog init --project myapp          # Skip project name prompt
 
 # Add & remove entries
-chlog add -c added "New feature"    # Add entry to unreleased
-chlog add -c fixed -v 1.2.0 "Fix"  # Add to specific version
-chlog add -c changed -i "Refactor" # Add as internal entry
-chlog remove -c added "New feature" # Remove exact entry
-chlog remove -c added -m "feat"    # Remove by substring match
+chlog add added "New feature"       # Add entry to unreleased
+chlog add fixed -v 1.2.0 "Fix"     # Add to specific version
+chlog add changed -i "Refactor"    # Add as internal entry
+chlog remove added "New feature"    # Remove exact entry
+chlog remove added -m "feat"       # Remove by substring match
 
 # Generate & validate
-chlog sync                          # Generate CHANGELOG.md from YAML
+chlog sync                          # Generate CHANGELOG.md (public only)
 chlog sync --split                  # Generate both public + internal changelogs
 chlog check                         # CI gate — verify markdown matches YAML
 chlog check --split                 # Verify both public + internal changelogs
@@ -107,7 +107,7 @@ fixed:
 
 Two workflows — use one or both:
 
-**Per-change** — agent adds a changelog entry as part of each feature or fix. Install the [SKILL.md](#ai-agent-skill) so your agent knows the YAML schema and commands, then include "update CHANGELOG.yaml" in your task prompt. The agent can use `chlog add -c added "Description"` or edit the YAML directly — either works.
+**Per-change** — agent adds a changelog entry as part of each feature or fix. Install the [SKILL.md](#ai-agent-skill) so your agent knows the YAML schema and commands, then include "update CHANGELOG.yaml" in your task prompt. The agent can use `chlog add added "Description"` or edit the YAML directly — either works.
 
 **At release time** — agent reviews all commits since the last release, groups them into user-facing summaries, and writes the YAML. `chlog scaffold --write` gives it a starting point from conventional commits, then the agent curates.
 

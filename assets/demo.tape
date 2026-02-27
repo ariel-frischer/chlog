@@ -45,11 +45,11 @@ Enter
 Sleep 1.5s
 
 # 2. Add entries
-Type@30ms "chlog add -c added 'User authentication with JWT'"
+Type@30ms "chlog add added 'User authentication with JWT'"
 Enter
 Sleep 1s
 
-Type@30ms "chlog add -c fixed 'Memory leak in connection pool'"
+Type@30ms "chlog add fixed 'Memory leak in connection pool'"
 Enter
 Sleep 1s
 

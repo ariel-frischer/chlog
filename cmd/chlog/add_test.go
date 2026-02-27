@@ -15,11 +15,10 @@ func TestRunAdd_BasicPublicEntry(t *testing.T) {
 		Versions: []changelog.Version{{Version: "unreleased"}},
 	})
 
-	addCategory = "added"
 	addVersion = "unreleased"
 	addInternal = false
 
-	if err := runAdd(nil, []string{"New feature"}); err != nil {
+	if err := runAdd(nil, []string{"added", "New feature"}); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -42,11 +41,10 @@ func TestRunAdd_MultipleEntries(t *testing.T) {
 		Versions: []changelog.Version{{Version: "unreleased"}},
 	})
 
-	addCategory = "added"
 	addVersion = "unreleased"
 	addInternal = false
 
-	if err := runAdd(nil, []string{"Feature A", "Feature B", "Feature C"}); err != nil {
+	if err := runAdd(nil, []string{"added", "Feature A", "Feature B", "Feature C"}); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -71,11 +69,10 @@ func TestRunAdd_InternalEntry(t *testing.T) {
 		Versions: []changelog.Version{{Version: "unreleased"}},
 	})
 
-	addCategory = "changed"
 	addVersion = "unreleased"
 	addInternal = true
 
-	if err := runAdd(nil, []string{"Refactor auth"}); err != nil {
+	if err := runAdd(nil, []string{"changed", "Refactor auth"}); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -101,11 +98,10 @@ func TestRunAdd_AutoCreatesUnreleased(t *testing.T) {
 		Versions: []changelog.Version{v},
 	})
 
-	addCategory = "fixed"
 	addVersion = "unreleased"
 	addInternal = false
 
-	if err := runAdd(nil, []string{"Bug fix"}); err != nil {
+	if err := runAdd(nil, []string{"fixed", "Bug fix"}); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -133,11 +129,10 @@ func TestRunAdd_SpecificVersion(t *testing.T) {
 		Versions: []changelog.Version{{Version: "unreleased"}, v},
 	})
 
-	addCategory = "fixed"
 	addVersion = "1.0.0"
 	addInternal = false
 
-	if err := runAdd(nil, []string{"Hotfix"}); err != nil {
+	if err := runAdd(nil, []string{"fixed", "Hotfix"}); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -160,11 +155,10 @@ func TestRunAdd_NonexistentVersionErrors(t *testing.T) {
 		Versions: []changelog.Version{{Version: "unreleased"}},
 	})
 
-	addCategory = "added"
 	addVersion = "9.9.9"
 	addInternal = false
 
-	err := runAdd(nil, []string{"test"})
+	err := runAdd(nil, []string{"added", "test"})
 	if err == nil {
 		t.Fatal("expected error for nonexistent version")
 	}
@@ -181,11 +175,10 @@ func TestRunAdd_AppendsToExisting(t *testing.T) {
 		Versions: []changelog.Version{u},
 	})
 
-	addCategory = "added"
 	addVersion = "unreleased"
 	addInternal = false
 
-	if err := runAdd(nil, []string{"New feature"}); err != nil {
+	if err := runAdd(nil, []string{"added", "New feature"}); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 

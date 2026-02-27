@@ -10,37 +10,35 @@ import (
 )
 
 var (
-	addCategory string
 	addVersion  string
 	addInternal bool
 )
 
 var addCmd = &cobra.Command{
-	Use:   "add [entries...]",
+	Use:   "add <category> [entries...]",
 	Short: "Add entries to the changelog",
 	Long:  "Add one or more entries to a category in the changelog.",
-	Example: `  chlog add -c added "Support dark mode"
-  chlog add -c fixed --version 1.2.0 "Fix login timeout"
-  chlog add -c changed --internal "Refactor auth middleware"
-  chlog add -c added "Feature A" "Feature B"`,
-	Args: cobra.MinimumNArgs(1),
+	Example: `  chlog add added "Support dark mode"
+  chlog add fixed --version 1.2.0 "Fix login timeout"
+  chlog add changed --internal "Refactor auth middleware"
+  chlog add added "Feature A" "Feature B"`,
+	Args: cobra.MinimumNArgs(2),
 	RunE: runAdd,
 }
 
 func init() {
-	addCmd.Flags().StringVarP(&addCategory, "category", "c", "", "changelog category (e.g. added, fixed, changed)")
 	addCmd.Flags().StringVarP(&addVersion, "version", "v", "unreleased", "target version")
 	addCmd.Flags().BoolVarP(&addInternal, "internal", "i", false, "add as internal entry")
-	_ = addCmd.MarkFlagRequired("category")
 }
 
 func runAdd(cmd *cobra.Command, args []string) error {
-	category := strings.ToLower(strings.TrimSpace(addCategory))
+	category := strings.ToLower(strings.TrimSpace(args[0]))
+	entries := args[1:]
 	if err := validateCategory(category); err != nil {
 		return err
 	}
 
-	for _, text := range args {
+	for _, text := range entries {
 		if strings.TrimSpace(text) == "" {
 			return fmt.Errorf("entry text must not be empty")
 		}
@@ -64,7 +62,7 @@ func runAdd(cmd *cobra.Command, args []string) error {
 		changes = &v.Internal
 	}
 
-	for _, text := range args {
+	for _, text := range entries {
 		changes.Append(category, text)
 	}
 
@@ -76,7 +74,7 @@ func runAdd(cmd *cobra.Command, args []string) error {
 	if addInternal {
 		label = "internal"
 	}
-	success("Added %d %s %s entr%s to %s", len(args), label, categoryRef(category), pluralY(len(args)), versionRef(v.Version))
+	success("Added %d %s %s entr%s to %s", len(entries), label, categoryRef(category), pluralY(len(entries)), versionRef(v.Version))
 	return nil
 }
 

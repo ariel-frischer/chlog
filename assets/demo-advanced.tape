@@ -47,7 +47,7 @@ Sleep 300ms
 Type "chlog init --project my-app"
 Enter
 Sleep 300ms
-Type "chlog add -c added 'Internal refactor' --internal"
+Type "chlog add added 'Internal refactor' --internal"
 Enter
 Sleep 300ms
 Type "chlog release 1.0.0"

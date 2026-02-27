@@ -10,35 +10,32 @@ import (
 )
 
 var (
-	removeCategory string
 	removeVersion  string
 	removeInternal bool
 	removeMatch    bool
 )
 
 var removeCmd = &cobra.Command{
-	Use:   "remove [entry]",
+	Use:   "remove <category> <entry>",
 	Short: "Remove an entry from the changelog",
 	Long:  "Remove a single entry from a category in the changelog.",
-	Example: `  chlog remove -c added "Support dark mode"
-  chlog remove -c added --match "dark mode"
-  chlog remove -c fixed --version 1.2.0 "Fix login timeout"
-  chlog remove -c changed --internal "Refactor auth"`,
-	Args: cobra.ExactArgs(1),
+	Example: `  chlog remove added "Support dark mode"
+  chlog remove added --match "dark mode"
+  chlog remove fixed --version 1.2.0 "Fix login timeout"
+  chlog remove changed --internal "Refactor auth"`,
+	Args: cobra.ExactArgs(2),
 	RunE: runRemove,
 }
 
 func init() {
-	removeCmd.Flags().StringVarP(&removeCategory, "category", "c", "", "changelog category (e.g. added, fixed, changed)")
 	removeCmd.Flags().StringVarP(&removeVersion, "version", "v", "unreleased", "target version")
 	removeCmd.Flags().BoolVarP(&removeInternal, "internal", "i", false, "remove from internal entries")
 	removeCmd.Flags().BoolVarP(&removeMatch, "match", "m", false, "use case-insensitive substring matching")
-	_ = removeCmd.MarkFlagRequired("category")
 }
 
 func runRemove(cmd *cobra.Command, args []string) error {
-	category := strings.ToLower(strings.TrimSpace(removeCategory))
-	text := args[0]
+	category := strings.ToLower(strings.TrimSpace(args[0]))
+	text := args[1]
 	if strings.TrimSpace(text) == "" {
 		return fmt.Errorf("entry text must not be empty")
 	}

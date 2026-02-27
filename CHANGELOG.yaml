@@ -10,6 +10,7 @@ versions:
         changed:
             - Extracted UI formatting logic into dedicated `ui.go` for cleaner command code
             - '`chlog show --last` uses colored version/category refs unless `--plain` is set'
+            - Make category a positional argument for add and remove commands, removing the -c/--category flag
         fixed:
             - Version header formatting in changelog terminal output
             - goreleaser uses replace mode to overwrite existing releases

@@ -13,9 +13,9 @@ perf, or implementation details.
 Write entries as concise, user-facing descriptions (not commit messages).
 You can add entries via CLI or by editing YAML directly:
 
-  chlog add -c added "New feature"          # Add to unreleased
-  chlog add -c changed -i "Refactored X"    # Add internal entry
-  chlog remove -c added "Reverted feature"  # Remove an entry
+  chlog add added "New feature"             # Add to unreleased
+  chlog add changed -i "Refactored X"       # Add internal entry
+  chlog remove added "Reverted feature"     # Remove an entry
 
 After editing, validate and sync:
 

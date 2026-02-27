@@ -35,14 +35,14 @@ chlog show 1.2.0                # Single version
 chlog show --last 5             # Last N entries
 chlog show --plain              # No ANSI
 chlog extract 1.0.0             # Markdown for one version (pipe to gh release)
-chlog add -c added "Feature"    # Add entry to unreleased
-chlog add -c fixed -v 1.0.0 "Fix" # Add to specific version
-chlog add -c changed -i "Refactor" # Add as internal entry
-chlog add -c added "A" "B"     # Add multiple entries at once
-chlog remove -c added "Feature" # Remove exact entry from unreleased
-chlog remove -c added -m "feat" # Remove by substring match
-chlog remove -c fixed -v 1.0.0 "Fix" # Remove from specific version
-chlog remove -c changed -i "Refactor" # Remove internal entry
+chlog add added "Feature"       # Add entry to unreleased
+chlog add fixed -v 1.0.0 "Fix" # Add to specific version
+chlog add changed -i "Refactor" # Add as internal entry
+chlog add added "A" "B"        # Add multiple entries at once
+chlog remove added "Feature"    # Remove exact entry from unreleased
+chlog remove added -m "feat"   # Remove by substring match
+chlog remove fixed -v 1.0.0 "Fix" # Remove from specific version
+chlog remove changed -i "Refactor" # Remove internal entry
 chlog scaffold                  # Dry-run: conventional commits → YAML
 chlog scaffold --write          # Merge into CHANGELOG.yaml
 chlog release 1.0.0             # Promote unreleased → 1.0.0 (today's date)

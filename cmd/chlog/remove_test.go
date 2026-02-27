@@ -19,12 +19,11 @@ func TestRunRemove_ExactMatch(t *testing.T) {
 		Versions: []changelog.Version{u},
 	})
 
-	removeCategory = "added"
 	removeVersion = "unreleased"
 	removeInternal = false
 	removeMatch = false
 
-	if err := runRemove(nil, []string{"Feature A"}); err != nil {
+	if err := runRemove(nil, []string{"added", "Feature A"}); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -47,12 +46,11 @@ func TestRunRemove_SubstringMatch(t *testing.T) {
 		Versions: []changelog.Version{u},
 	})
 
-	removeCategory = "fixed"
 	removeVersion = "unreleased"
 	removeInternal = false
 	removeMatch = true
 
-	if err := runRemove(nil, []string{"login"}); err != nil {
+	if err := runRemove(nil, []string{"fixed", "login"}); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -75,12 +73,11 @@ func TestRunRemove_SubstringMultipleMatchErrors(t *testing.T) {
 		Versions: []changelog.Version{u},
 	})
 
-	removeCategory = "fixed"
 	removeVersion = "unreleased"
 	removeInternal = false
 	removeMatch = true
 
-	err := runRemove(nil, []string{"login"})
+	err := runRemove(nil, []string{"fixed", "login"})
 	if err == nil {
 		t.Fatal("expected error for multiple matches")
 	}
@@ -98,12 +95,11 @@ func TestRunRemove_InternalEntry(t *testing.T) {
 		Versions: []changelog.Version{u},
 	})
 
-	removeCategory = "changed"
 	removeVersion = "unreleased"
 	removeInternal = true
 	removeMatch = false
 
-	if err := runRemove(nil, []string{"Refactor auth"}); err != nil {
+	if err := runRemove(nil, []string{"changed", "Refactor auth"}); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -126,12 +122,11 @@ func TestRunRemove_SpecificVersion(t *testing.T) {
 		Versions: []changelog.Version{{Version: "unreleased"}, v},
 	})
 
-	removeCategory = "added"
 	removeVersion = "1.0.0"
 	removeInternal = false
 	removeMatch = false
 
-	if err := runRemove(nil, []string{"Feature A"}); err != nil {
+	if err := runRemove(nil, []string{"added", "Feature A"}); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
@@ -151,12 +146,11 @@ func TestRunRemove_VersionNotFound(t *testing.T) {
 		Versions: []changelog.Version{{Version: "unreleased"}},
 	})
 
-	removeCategory = "added"
 	removeVersion = "9.9.9"
 	removeInternal = false
 	removeMatch = false
 
-	err := runRemove(nil, []string{"test"})
+	err := runRemove(nil, []string{"added", "test"})
 	if err == nil {
 		t.Fatal("expected error for nonexistent version")
 	}
@@ -173,12 +167,11 @@ func TestRunRemove_CategoryNotFound(t *testing.T) {
 		Versions: []changelog.Version{u},
 	})
 
-	removeCategory = "removed"
 	removeVersion = "unreleased"
 	removeInternal = false
 	removeMatch = false
 
-	err := runRemove(nil, []string{"anything"})
+	err := runRemove(nil, []string{"removed", "anything"})
 	if err == nil {
 		t.Fatal("expected error for nonexistent category")
 	}
@@ -195,12 +188,11 @@ func TestRunRemove_EntryNotFound(t *testing.T) {
 		Versions: []changelog.Version{u},
 	})
 
-	removeCategory = "added"
 	removeVersion = "unreleased"
 	removeInternal = false
 	removeMatch = false
 
-	err := runRemove(nil, []string{"Nonexistent"})
+	err := runRemove(nil, []string{"added", "Nonexistent"})
 	if err == nil {
 		t.Fatal("expected error for nonexistent entry")
 	}
@@ -218,12 +210,11 @@ func TestRunRemove_CleansUpEmptyCategory(t *testing.T) {
 		Versions: []changelog.Version{u},
 	})
 
-	removeCategory = "added"
 	removeVersion = "unreleased"
 	removeInternal = false
 	removeMatch = false
 
-	if err := runRemove(nil, []string{"Only entry"}); err != nil {
+	if err := runRemove(nil, []string{"added", "Only entry"}); err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
 
