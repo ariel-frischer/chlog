@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Color-coded CLI output — success (green), warning (yellow), error (red) messages across all commands
+- Semantic color helpers for versions (magenta bold), file paths (cyan), categories (per-type colors)
+- `--no-color` global flag to disable colored output
+- Colorized version headers in `chlog show` with styled version, date, and delimiters
+- Demo GIFs for basic and advanced usage in assets/
+
+### Changed
+
+- Extracted UI formatting logic into dedicated `ui.go` for cleaner command code
+- `chlog show --last` uses colored version/category refs unless `--plain` is set
+- Make category a positional argument for add and remove commands, removing the -c/--category flag
+
+### Fixed
+
+- Version header formatting in changelog terminal output
+- goreleaser uses replace mode to overwrite existing releases
+- CI cleans build artifacts before goreleaser to prevent dirty git state
+
 ## [0.1.0] - 2026-02-26
 
 ### Changed
