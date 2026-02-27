@@ -66,13 +66,11 @@ func FormatVersion(v *Version, opts FormatOptions) string {
 		opts.MaxWidth = 80
 	}
 	var b strings.Builder
-	bold := color.New(color.Bold)
 
-	header := formatVersionHeader(v)
 	if opts.Plain {
-		fmt.Fprintf(&b, "%s\n", header)
+		fmt.Fprintf(&b, "%s\n", formatVersionHeader(v))
 	} else {
-		fmt.Fprintf(&b, "%s\n", bold.Sprint(header))
+		fmt.Fprintf(&b, "%s\n", formatVersionHeaderColor(v))
 	}
 
 	changes := v.Public
@@ -108,6 +106,22 @@ func formatVersionHeader(v *Version) string {
 		return "[Unreleased]"
 	}
 	return fmt.Sprintf("[%s] - %s", v.Version, v.Date)
+}
+
+func formatVersionHeaderColor(v *Version) string {
+	versionColor := color.New(color.FgMagenta, color.Bold)
+	dateColor := color.New(color.FgCyan)
+	dimColor := color.New(color.FgWhite)
+	if v.IsUnreleased() {
+		return versionColor.Sprint("[Unreleased]")
+	}
+	return fmt.Sprintf("%s%s%s %s %s",
+		dimColor.Sprint("["),
+		versionColor.Sprint(v.Version),
+		dimColor.Sprint("]"),
+		dimColor.Sprint("-"),
+		dateColor.Sprint(v.Date),
+	)
 }
 
 // wrapText wraps text at word boundaries to fit within maxWidth, indenting continuation lines.

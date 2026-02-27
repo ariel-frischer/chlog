@@ -59,7 +59,7 @@ func syncFile(c *changelog.Changelog, cfg *changelog.Config, internal bool, path
 
 	existing, _ := os.ReadFile(path)
 	if bytes.Equal(existing, []byte(rendered)) {
-		fmt.Printf("%s is up to date\n", path)
+		success("%s is up to date", fileRef(path))
 		return nil
 	}
 
@@ -67,6 +67,6 @@ func syncFile(c *changelog.Changelog, cfg *changelog.Config, internal bool, path
 		return fmt.Errorf("writing %s: %w", path, err)
 	}
 
-	fmt.Printf("Generated %s\n", path)
+	success("Generated %s", fileRef(path))
 	return nil
 }

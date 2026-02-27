@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/ariel-frischer/chlog/pkg/changelog"
 	"github.com/spf13/cobra"
 )
@@ -18,6 +16,6 @@ func runValidate(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("CHANGELOG.yaml is valid")
+	success("%s is valid", fileRef("CHANGELOG.yaml"))
 	return nil
 }

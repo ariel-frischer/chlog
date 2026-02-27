@@ -43,25 +43,25 @@ func runInit(cmd *cobra.Command, args []string) error {
 	if err := changelog.Save(c, yamlFile); err != nil {
 		return fmt.Errorf("creating %s: %w", yamlFile, err)
 	}
-	fmt.Printf("Created %s for project %q\n", yamlFile, name)
+	success("Created %s for project %s", fileRef(yamlFile), highlight(name))
 
 	// Create .chlog.yaml config with auto-detected repo URL.
 	configPath := changelog.DefaultConfigFile
 	if _, err := os.Stat(configPath); err == nil {
-		fmt.Printf("%s already exists, skipping config creation\n", configPath)
+		warn("%s already exists, skipping config creation", fileRef(configPath))
 		return nil
 	}
 
 	cfg := &changelog.Config{}
 	if url, err := changelog.DetectRepoURL(); err == nil {
 		cfg.RepoURL = url
-		fmt.Printf("Detected repo URL: %s\n", url)
+		fmt.Printf("Detected repo URL: %s\n", highlight(url))
 	}
 
 	if err := changelog.SaveConfig(cfg, configPath); err != nil {
 		return fmt.Errorf("creating %s: %w", configPath, err)
 	}
-	fmt.Printf("Created %s\n", configPath)
+	success("Created %s", fileRef(configPath))
 	return nil
 }
 

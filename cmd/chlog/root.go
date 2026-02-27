@@ -34,6 +34,14 @@ func init() {
 		}
 	}
 
+	var noColor bool
+	rootCmd.PersistentFlags().BoolVar(&noColor, "no-color", false, "disable colored output")
+	rootCmd.PersistentPreRun = func(cmd *cobra.Command, args []string) {
+		if noColor {
+			color.NoColor = true
+		}
+	}
+
 	rootCmd.PersistentFlags().StringVarP(&yamlFile, "file", "f", defaultYAMLFile, "path to CHANGELOG.yaml")
 	rootCmd.PersistentFlags().StringVar(&configFile, "config", changelog.DefaultConfigFile, "path to config file")
 

@@ -74,7 +74,7 @@ func runRemove(cmd *cobra.Command, args []string) error {
 	if removeInternal {
 		label = "internal"
 	}
-	fmt.Printf("Removed %s %s entry from %s: %s\n", label, category, v.Version, removed)
+	success("Removed %s %s entry from %s: %s", label, categoryRef(category), versionRef(v.Version), removed)
 	return nil
 }
 
@@ -82,9 +82,9 @@ func formatRemoveError(err error) error {
 	switch e := err.(type) {
 	case changelog.MultipleMatchError:
 		var b strings.Builder
-		fmt.Fprintf(&b, "multiple entries match %q in %s:\n", e.Text, e.Category)
+		fmt.Fprintf(&b, "multiple entries match %q in %s:\n", e.Text, categoryRef(e.Category))
 		for _, m := range e.Matches {
-			fmt.Fprintf(&b, "  - %s\n", m)
+			fmt.Fprintf(&b, "  - %s\n", highlight(m))
 		}
 		b.WriteString("use exact text to remove a specific entry")
 		return fmt.Errorf("%s", b.String())

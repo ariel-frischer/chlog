@@ -76,7 +76,7 @@ func runAdd(cmd *cobra.Command, args []string) error {
 	if addInternal {
 		label = "internal"
 	}
-	fmt.Printf("Added %d %s %s entr%s to %s\n", len(args), label, category, pluralY(len(args)), v.Version)
+	success("Added %d %s %s entr%s to %s", len(args), label, categoryRef(category), pluralY(len(args)), versionRef(v.Version))
 	return nil
 }
 

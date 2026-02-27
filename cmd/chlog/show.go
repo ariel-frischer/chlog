@@ -48,7 +48,11 @@ func runShow(cmd *cobra.Command, args []string) error {
 	if showLast > 0 {
 		entries := c.GetLastN(showLast, changelog.QueryOptions{IncludeInternal: internal})
 		for _, e := range entries {
+			if showPlain {
 			fmt.Printf("[%s] %s: %s\n", e.Version, e.Category, e.Text)
+		} else {
+			fmt.Printf("[%s] %s: %s\n", versionRef(e.Version), categoryRef(e.Category), e.Text)
+		}
 		}
 		return nil
 	}

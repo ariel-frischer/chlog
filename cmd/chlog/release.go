@@ -43,6 +43,6 @@ func runRelease(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("saving %s: %w", yamlFile, err)
 	}
 
-	fmt.Printf("Released %s (%s) — unreleased block reset\n", ver, date)
+	success("Released %s (%s) — unreleased block reset", versionRef(ver), highlight(date))
 	return nil
 }

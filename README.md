@@ -16,6 +16,10 @@ One YAML source of truth. No drift. Write curated entries, generate public or in
 
 </div>
 
+<p align="center">
+  <img src="assets/demo.gif" alt="chlog demo" width="600">
+</p>
+
 ## Install
 
 ```bash
@@ -48,7 +52,9 @@ chlog remove -c added -m "feat"    # Remove by substring match
 
 # Generate & validate
 chlog sync                          # Generate CHANGELOG.md from YAML
+chlog sync --split                  # Generate both public + internal changelogs
 chlog check                         # CI gate — verify markdown matches YAML
+chlog check --split                 # Verify both public + internal changelogs
 chlog validate                      # Validate YAML schema
 
 # View & extract
@@ -66,6 +72,15 @@ chlog scaffold --version 1.2.0      # Scaffold with explicit version string
 chlog release 1.0.0                 # Promote unreleased → 1.0.0 with today's date
 chlog release 1.0.0 --date 2026-03-01  # Promote with explicit date
 ```
+
+<details>
+<summary>Advanced commands demo</summary>
+
+<p align="center">
+  <img src="assets/demo-advanced.gif" alt="chlog advanced demo" width="600">
+</p>
+
+</details>
 
 ## Why?
 

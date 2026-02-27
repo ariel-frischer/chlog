@@ -29,7 +29,7 @@ func init() {
 func runCheck(cmd *cobra.Command, args []string) error {
 	c, err := changelog.Load(yamlFile)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "validation error: %v\n", err)
+		fmt.Fprintln(os.Stderr, errFmt.Sprintf("validation error: %v", err))
 		os.Exit(2)
 	}
 
@@ -56,21 +56,21 @@ func checkFile(c *changelog.Changelog, cfg *changelog.Config, internal bool, pat
 		Config:          cfg,
 	})
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "render error: %v\n", err)
+		fmt.Fprintln(os.Stderr, errFmt.Sprintf("render error: %v", err))
 		os.Exit(2)
 	}
 
 	existing, err := os.ReadFile(path)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s not found — run 'chlog sync' first\n", path)
+		fmt.Fprintln(os.Stderr, errFmt.Sprintf("%s not found — run 'chlog sync' first", fileRef(path)))
 		os.Exit(1)
 	}
 
 	if !bytes.Equal(existing, []byte(rendered)) {
-		fmt.Fprintf(os.Stderr, "%s is out of sync — run 'chlog sync'\n", path)
+		warn("%s is out of sync — run 'chlog sync'", fileRef(path))
 		os.Exit(1)
 	}
 
-	fmt.Printf("%s is in sync\n", path)
+	success("%s is in sync", fileRef(path))
 	return nil
 }
