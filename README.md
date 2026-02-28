@@ -12,7 +12,7 @@
 [![Go Report Card](https://img.shields.io/badge/go%20report-A+-brightgreen.svg?style=flat)](https://goreportcard.com/report/github.com/ariel-frischer/chlog)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
-One YAML source of truth. No drift. Write curated entries, generate public or internal release notes.
+AI-agent ready. One source of truth. No drift. Write curated entries, generate changelogs and release notes.
 
 </div>
 
