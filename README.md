@@ -119,6 +119,67 @@ fixed:
   - "Auth no longer crashes on expired tokens"
 ```
 
+### AI Agent Skill
+
+chlog ships a [SKILL.md](.skills/default/SKILL.md) following the [Agent Skills open standard](https://agentskills.io). Install it so your coding agent knows the YAML schema and all chlog commands.
+
+**Quick install with [`skills`](https://skills.sh) CLI** (by Vercel Labs):
+
+```bash
+npx skills add ariel-frischer/chlog
+```
+
+<details>
+<summary><strong>Manual install</strong></summary>
+
+**Claude Code** — Skills live in `~/.claude/skills/` (global) or `.claude/skills/` (project-local).
+
+```bash
+# Global — available in all projects
+mkdir -p ~/.claude/skills/chlog
+curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
+  -o ~/.claude/skills/chlog/SKILL.md
+
+# Project-local — checked into this repo only
+mkdir -p .claude/skills/chlog
+curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
+  -o .claude/skills/chlog/SKILL.md
+```
+
+Then use `/chlog` in conversations.
+
+**OpenCode** — reads skills from `~/.claude/skills/` (global) or `.opencode/skills/` (project-local).
+
+```bash
+# Global
+mkdir -p ~/.claude/skills/chlog
+curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
+  -o ~/.claude/skills/chlog/SKILL.md
+
+# Project-local
+mkdir -p .opencode/skills/chlog
+curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
+  -o .opencode/skills/chlog/SKILL.md
+```
+
+**Codex CLI** — reads skills from `~/.codex/skills/` (global) or `.codex/skills/` (project-local).
+
+```bash
+# Global
+mkdir -p ~/.codex/skills/chlog
+curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
+  -o ~/.codex/skills/chlog/SKILL.md
+
+# Project-local
+mkdir -p .codex/skills/chlog
+curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
+  -o .codex/skills/chlog/SKILL.md
+```
+
+Or pass directly: `codex --instructions .skills/default/SKILL.md`
+
+</details>
+
 ### Using AI agents with chlog
 
 Two workflows — use one or both:
@@ -298,79 +359,6 @@ chlog completion fish > ~/.config/fish/completions/chlog.fish
 ```powershell
 chlog completion powershell | Out-String | Invoke-Expression
 ```
-
-## AI Agent Skill
-
-chlog ships a [SKILL.md](.skills/default/SKILL.md) following the [Agent Skills open standard](https://agentskills.io). Install it so your coding agent knows the YAML schema and all chlog commands.
-
-**Quick install with [`skills`](https://skills.sh) CLI** (by Vercel Labs):
-
-```bash
-npx skills add ariel-frischer/chlog
-```
-
-### Manual install
-
-<details>
-<summary><strong>Claude Code</strong></summary>
-
-Skills live in `~/.claude/skills/` (global) or `.claude/skills/` (project-local).
-
-```bash
-# Global — available in all projects
-mkdir -p ~/.claude/skills/chlog
-curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
-  -o ~/.claude/skills/chlog/SKILL.md
-
-# Project-local — checked into this repo only
-mkdir -p .claude/skills/chlog
-curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
-  -o .claude/skills/chlog/SKILL.md
-```
-
-Then use `/chlog` in conversations.
-
-</details>
-
-<details>
-<summary><strong>OpenCode</strong></summary>
-
-OpenCode reads skills from `~/.claude/skills/` (global) or `.opencode/skills/` (project-local).
-
-```bash
-# Global
-mkdir -p ~/.claude/skills/chlog
-curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
-  -o ~/.claude/skills/chlog/SKILL.md
-
-# Project-local
-mkdir -p .opencode/skills/chlog
-curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
-  -o .opencode/skills/chlog/SKILL.md
-```
-
-</details>
-
-<details>
-<summary><strong>Codex CLI</strong></summary>
-
-Codex reads skills from `~/.codex/skills/` (global) or `.codex/skills/` (project-local).
-
-```bash
-# Global
-mkdir -p ~/.codex/skills/chlog
-curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
-  -o ~/.codex/skills/chlog/SKILL.md
-
-# Project-local
-mkdir -p .codex/skills/chlog
-curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
-  -o .codex/skills/chlog/SKILL.md
-```
-
-Or pass directly: `codex --instructions .skills/default/SKILL.md`
-
-</details>
 
 ## Contributing
 
