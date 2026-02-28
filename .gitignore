@@ -35,3 +35,7 @@ Thumbs.db
 .claude/
 CLAUDE.md
 TODO.md
+
+# Agent Skills (npx skills add)
+.agents/
+skills-lock.json

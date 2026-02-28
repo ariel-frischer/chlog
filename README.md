@@ -9,7 +9,7 @@
 
 [![CI](https://github.com/ariel-frischer/chlog/actions/workflows/ci.yml/badge.svg)](https://github.com/ariel-frischer/chlog/actions/workflows/ci.yml)
 [![GitHub Release](https://img.shields.io/github/v/release/ariel-frischer/chlog)](https://github.com/ariel-frischer/chlog/releases/latest)
-[![Go Report Card](https://goreportcard.com/badge/github.com/ariel-frischer/chlog)](https://goreportcard.com/report/github.com/ariel-frischer/chlog)
+[![Go Report Card](https://img.shields.io/badge/go%20report-A+-brightgreen.svg?style=flat)](https://goreportcard.com/report/github.com/ariel-frischer/chlog)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 One YAML source of truth. No drift. Write curated entries, generate public or internal release notes.
@@ -285,23 +285,76 @@ chlog completion powershell | Out-String | Invoke-Expression
 
 ## AI Agent Skill
 
-chlog ships a [SKILL.md](.skills/default/SKILL.md) following the [agent skills open standard](https://agentskills.io). Compatible with Claude Code, Cursor, Codex, Gemini CLI, VS Code, and 20+ other agents.
+chlog ships a [SKILL.md](.skills/default/SKILL.md) following the [Agent Skills open standard](https://agentskills.io). Install it so your coding agent knows the YAML schema and all chlog commands.
 
-**Install with [skills CLI](https://github.com/nicepkg/agent-skills):**
+**Quick install with [`skills`](https://skills.sh) CLI** (by Vercel Labs):
 
 ```bash
-npx skills add https://github.com/ariel-frischer/chlog
+npx skills add ariel-frischer/chlog
 ```
 
-**Manual install (Claude Code):**
+### Manual install
+
+<details>
+<summary><strong>Claude Code</strong></summary>
+
+Skills live in `~/.claude/skills/` (global) or `.claude/skills/` (project-local).
 
 ```bash
+# Global — available in all projects
 mkdir -p ~/.claude/skills/chlog
 curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
   -o ~/.claude/skills/chlog/SKILL.md
+
+# Project-local — checked into this repo only
+mkdir -p .claude/skills/chlog
+curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
+  -o .claude/skills/chlog/SKILL.md
 ```
 
-Then use `/chlog` in conversations to get changelog command guidance.
+Then use `/chlog` in conversations.
+
+</details>
+
+<details>
+<summary><strong>OpenCode</strong></summary>
+
+OpenCode reads skills from `~/.claude/skills/` (global) or `.opencode/skills/` (project-local).
+
+```bash
+# Global
+mkdir -p ~/.claude/skills/chlog
+curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
+  -o ~/.claude/skills/chlog/SKILL.md
+
+# Project-local
+mkdir -p .opencode/skills/chlog
+curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
+  -o .opencode/skills/chlog/SKILL.md
+```
+
+</details>
+
+<details>
+<summary><strong>Codex CLI</strong></summary>
+
+Codex reads skills from `~/.codex/skills/` (global) or `.codex/skills/` (project-local).
+
+```bash
+# Global
+mkdir -p ~/.codex/skills/chlog
+curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
+  -o ~/.codex/skills/chlog/SKILL.md
+
+# Project-local
+mkdir -p .codex/skills/chlog
+curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/.skills/default/SKILL.md \
+  -o .codex/skills/chlog/SKILL.md
+```
+
+Or pass directly: `codex --instructions .skills/default/SKILL.md`
+
+</details>
 
 ## Contributing
 
