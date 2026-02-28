@@ -26,6 +26,16 @@ One YAML source of truth. No drift. Write curated entries, generate public or in
 curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/install.sh | sh
 ```
 
+## Features
+
+📝 **YAML source of truth** — structured, diffable, machine-readable changelog
+✅ **Schema validation** — catch malformed entries before they reach CI
+📦 **One-command releases** — stamp version, generate Markdown, extract release notes
+🔀 **Public + internal entries** — separate customer-facing notes from implementation details
+🤖 **AI-agent ready** — ships an [Agent Skill](#ai-agent-skill) so coding agents know the schema and commands
+🔧 **Scaffold from commits** — auto-generate entries from conventional commits as a starting point
+🚀 **CI integration** — `chlog check` as a pipeline gate, `chlog extract` for GitHub Releases
+
 ## Quickstart
 
 ```bash
@@ -85,6 +95,12 @@ chlog release 1.0.0 --date 2026-03-01  # Promote with explicit date
 ## Why?
 
 Commit-based changelog tools (git-cliff, semantic-release) dump raw git logs. That works when humans write every commit, but AI agents generate dozens of implementation commits per feature. You don't want that noise in your release notes — you want **curated entries that tell users what actually changed**.
+
+- **Structured YAML** — machine-readable, diffable, easy for agents and scripts to edit
+- **Schema validation** — `chlog check` catches malformed entries before they hit CI
+- **One-command releases** — `chlog release v1.2.0` stamps the version, generates Markdown, done
+- **CI-friendly** — validate in pipelines, extract release notes for GitHub Releases or Slack, no manual formatting
+- **Curated over generated** — you control what users see, not your git log
 
 `chlog` separates product communication from implementation history:
 
