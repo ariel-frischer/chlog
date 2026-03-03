@@ -1,6 +1,15 @@
 project: chlog
 versions:
-    unreleased: {}
+    unreleased:
+        added:
+            - '`chlog config init` — creates a `.chlog.yaml` config file interactively'
+            - '`chlog config set` — sets individual config values from the CLI'
+            - '`chlog config show` — displays current config file contents'
+        changed:
+            - '`chlog init` no longer auto-creates `.chlog.yaml`; use `chlog config init` instead'
+        internal:
+            added:
+                - Unit tests for config initialization and setting commands
     0.2.0:
         date: 2026-02-26
         added:
