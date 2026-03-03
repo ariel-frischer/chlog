@@ -39,7 +39,7 @@ curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/install.s
 ## Quickstart
 
 ```bash
-chlog init                          # Create CHANGELOG.yaml + .chlog.yaml
+chlog init                          # Create CHANGELOG.yaml
 chlog add added "New feature"       # Add entry to unreleased
 chlog add fixed "Bug fix"           # Add a fix
 chlog sync                          # Generate CHANGELOG.md (public only)
@@ -50,8 +50,14 @@ chlog release 1.0.0                 # Promote unreleased → 1.0.0
 
 ```bash
 # Setup
-chlog init                          # Create CHANGELOG.yaml + .chlog.yaml (auto-detects repo URL)
+chlog init                          # Create CHANGELOG.yaml (prompts for project name)
 chlog init --project myapp          # Skip project name prompt
+chlog config init                   # Scaffold .chlog.yaml (optional, for non-default settings)
+chlog config show                   # Print resolved config with source annotations
+chlog config set repo_url https://github.com/org/repo
+chlog config set public_file docs/CHANGELOG.md
+chlog config set changelog_file changelogs/CHANGELOG.yaml
+chlog config edit                   # Open .chlog.yaml in $EDITOR
 
 # Add & remove entries
 chlog add added "New feature"       # Add entry to unreleased
@@ -231,18 +237,31 @@ To always include internal entries, set `include_internal: true` in `.chlog.yaml
 
 ## Config
 
-Optional `.chlog.yaml` in your project root. Created automatically by `chlog init` with auto-detected values:
+`.chlog.yaml` is optional — all defaults work without it. Create one only when you need to override paths, categories, or other settings.
+
+```bash
+chlog config init    # scaffold .chlog.yaml with commented defaults
+chlog config set repo_url https://github.com/myorg/myproject
+chlog config show    # inspect resolved values (file / detected / default)
+```
 
 ```yaml
-repo_url: https://github.com/myorg/myproject
-include_internal: true
-categories: [added, changed, fixed, performance]  # custom allowlist (optional)
-strict_categories: false                           # false = accept any category (optional)
+# .chlog.yaml — all fields optional
+repo_url: https://github.com/myorg/myproject   # auto-detected from git remote if omitted
+changelog_file: CHANGELOG.yaml                 # path to YAML source
+public_file: CHANGELOG.md                      # output path for public markdown
+internal_file: CHANGELOG-internal.md           # output path for internal markdown
+include_internal: false                         # include internal tier by default
+categories: [added, changed, fixed, performance] # custom allowlist (optional)
+strict_categories: false                        # false = accept any category
 ```
 
 | Field | Default | Description |
 |-------|---------|-------------|
 | `repo_url` | auto-detect from `git remote origin` | Used for version comparison links in `CHANGELOG.md` |
+| `changelog_file` | `CHANGELOG.yaml` | Source YAML path (overrides `-f` flag default) |
+| `public_file` | `CHANGELOG.md` | Output path for public changelog |
+| `internal_file` | `CHANGELOG-internal.md` | Output path for internal changelog |
 | `include_internal` | `false` | Include internal entries in all commands (`sync`, `show`, `extract`, `check`) |
 | `categories` | Keep a Changelog 6 | Custom allowlist of category names for validation |
 | `strict_categories` | `true` | Set to `false` to accept any category without validation |
