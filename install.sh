@@ -50,8 +50,8 @@ error() {
 # Detect OS
 detect_os() {
     case "$(uname -s)" in
-        Linux*)  echo "Linux" ;;
-        Darwin*) echo "Darwin" ;;
+        Linux*)  echo "linux" ;;
+        Darwin*) echo "darwin" ;;
         MINGW*|MSYS*|CYGWIN*)
             printf '%bWindows Detected%b\n\n' "${YELLOW}" "${NC}" >&2
             printf 'chlog requires WSL (Windows Subsystem for Linux).\n\n' >&2
@@ -69,7 +69,7 @@ detect_os() {
 # Detect architecture
 detect_arch() {
     case "$(uname -m)" in
-        x86_64|amd64) echo "x86_64" ;;
+        x86_64|amd64) echo "amd64" ;;
         aarch64|arm64) echo "arm64" ;;
         *) error "Unsupported architecture: $(uname -m)" ;;
     esac
