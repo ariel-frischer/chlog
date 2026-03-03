@@ -77,6 +77,18 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Ensure release notes are set
+        run: |
+          BODY=$(gh release view "${{ github.ref_name }}" --json body -q .body)
+          if [ -z "$BODY" ]; then
+            echo "Release body empty, patching with notes..."
+            gh release edit "${{ github.ref_name }}" --notes-file .release/notes.md
+          else
+            echo "Release body already set."
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   notify:
     name: Post-Release
     runs-on: ubuntu-latest
