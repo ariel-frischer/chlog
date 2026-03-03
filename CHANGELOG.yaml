@@ -1,6 +1,8 @@
 project: chlog
 versions:
-    unreleased:
+    unreleased: {}
+    0.3.0:
+        date: 2026-03-02
         added:
             - '`chlog config init` — creates a `.chlog.yaml` config file interactively'
             - '`chlog config set` — sets individual config values from the CLI'
