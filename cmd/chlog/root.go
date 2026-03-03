@@ -40,12 +40,19 @@ func init() {
 		if noColor {
 			color.NoColor = true
 		}
+		// Apply changelog_file from config only if --file wasn't explicitly passed.
+		if !cmd.Flags().Changed("file") {
+			if cfg, err := changelog.LoadConfig(configFile); err == nil && cfg.ChangelogFile != "" {
+				yamlFile = cfg.ChangelogFile
+			}
+		}
 	}
 
 	rootCmd.PersistentFlags().StringVarP(&yamlFile, "file", "f", defaultYAMLFile, "path to CHANGELOG.yaml")
 	rootCmd.PersistentFlags().StringVar(&configFile, "config", changelog.DefaultConfigFile, "path to config file")
 
 	rootCmd.AddCommand(initCmd)
+	rootCmd.AddCommand(configCmd)
 	rootCmd.AddCommand(syncCmd)
 	rootCmd.AddCommand(checkCmd)
 	rootCmd.AddCommand(validateCmd)

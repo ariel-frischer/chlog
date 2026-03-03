@@ -16,9 +16,10 @@ const (
 // Config holds project-specific chlog settings.
 type Config struct {
 	RepoURL          string   `yaml:"repo_url,omitempty"`
-	IncludeInternal  bool     `yaml:"include_internal,omitempty"`
+	ChangelogFile    string   `yaml:"changelog_file,omitempty"`
 	PublicFile       string   `yaml:"public_file,omitempty"`
 	InternalFile     string   `yaml:"internal_file,omitempty"`
+	IncludeInternal  bool     `yaml:"include_internal,omitempty"`
 	Categories       []string `yaml:"categories,omitempty"`
 	StrictCategories *bool    `yaml:"strict_categories,omitempty"`
 }
