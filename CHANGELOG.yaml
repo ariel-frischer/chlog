@@ -1,6 +1,10 @@
 project: chlog
 versions:
-    unreleased: {}
+    unreleased:
+        fixed:
+            - CLI commands honor configured categories when loading CHANGELOG.yaml
+            - sync and check write and compare the configured public_file instead of always CHANGELOG.md
+            - README go install path is github.com/ariel-frischer/chlog/cmd/chlog@latest
     0.3.0:
         date: 2026-03-02
         added:
