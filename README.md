@@ -9,7 +9,7 @@
 
 [![CI](https://github.com/ariel-frischer/chlog/actions/workflows/ci.yml/badge.svg)](https://github.com/ariel-frischer/chlog/actions/workflows/ci.yml)
 [![GitHub Release](https://img.shields.io/github/v/release/ariel-frischer/chlog)](https://github.com/ariel-frischer/chlog/releases/latest)
-[![Go Report Card](https://img.shields.io/badge/go%20report-A+-brightgreen.svg?style=flat)](https://goreportcard.com/report/github.com/ariel-frischer/chlog)
+[![Go Report Card](https://goreportcard.com/badge/github.com/ariel-frischer/chlog)](https://goreportcard.com/report/github.com/ariel-frischer/chlog)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 AI-agent ready. One source of truth. Write entries - generate changelogs.
@@ -44,6 +44,7 @@ chlog add added "New feature"       # Add entry to unreleased
 chlog add fixed "Bug fix"           # Add a fix
 chlog sync                          # Generate CHANGELOG.md (public only)
 chlog release 1.0.0                 # Promote unreleased → 1.0.0
+chlog sync                          # Regenerate CHANGELOG.md for the release
 ```
 
 ## Commands
@@ -104,7 +105,7 @@ Commit-based changelog tools (git-cliff, semantic-release) dump raw git logs. Th
 
 - **Structured YAML** — machine-readable, diffable, easy for agents and scripts to edit
 - **Schema validation** — `chlog check` catches malformed entries before they hit CI
-- **One-command releases** — `chlog release v1.2.0` stamps the version, generates Markdown, done
+- **Two-command releases** — `chlog release 1.2.0` stamps the version; `chlog sync` regenerates the Markdown
 - **CI-friendly** — validate in pipelines, extract release notes for GitHub Releases or Slack, no manual formatting
 - **Curated over generated** — you control what users see, not your git log
 
