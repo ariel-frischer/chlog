@@ -27,20 +27,19 @@ func init() {
 }
 
 func runCheck(cmd *cobra.Command, args []string) error {
-	c, err := changelog.Load(yamlFile)
+	cfg := loadConfig()
+	c, err := changelog.LoadWithConfig(yamlFile, cfg)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, errFmt.Sprintf("validation error: %v", err))
 		os.Exit(2)
 	}
-
-	cfg := loadConfig()
 
 	if checkSplit {
 		return runCheckSplit(c, cfg)
 	}
 
 	internal := checkInternal || cfg.IncludeInternal
-	return checkFile(c, cfg, internal, defaultMDFile)
+	return checkFile(c, cfg, internal, cfg.PublicFilePath())
 }
 
 func runCheckSplit(c *changelog.Changelog, cfg *changelog.Config) error {

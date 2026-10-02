@@ -12,7 +12,7 @@ var validateCmd = &cobra.Command{
 }
 
 func runValidate(cmd *cobra.Command, args []string) error {
-	_, err := changelog.Load(yamlFile)
+	_, err := changelog.LoadWithConfig(yamlFile, loadConfig())
 	if err != nil {
 		return err
 	}

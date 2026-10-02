@@ -25,7 +25,7 @@ func init() {
 func runRelease(cmd *cobra.Command, args []string) error {
 	ver := args[0]
 
-	c, err := changelog.Load(yamlFile)
+	c, err := changelog.LoadWithConfig(yamlFile, loadConfig())
 	if err != nil {
 		return err
 	}

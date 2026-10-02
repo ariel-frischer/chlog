@@ -9,10 +9,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const (
-	defaultYAMLFile = "CHANGELOG.yaml"
-	defaultMDFile   = "CHANGELOG.md"
-)
+const defaultYAMLFile = "CHANGELOG.yaml"
 
 var (
 	yamlFile   string

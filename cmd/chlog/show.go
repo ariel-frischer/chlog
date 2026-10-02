@@ -27,12 +27,12 @@ func init() {
 }
 
 func runShow(cmd *cobra.Command, args []string) error {
-	c, err := changelog.Load(yamlFile)
+	cfg := loadConfig()
+	c, err := changelog.LoadWithConfig(yamlFile, cfg)
 	if err != nil {
 		return err
 	}
 
-	cfg := loadConfig()
 	internal := showInternal || cfg.IncludeInternal
 	opts := changelog.FormatOptions{Plain: showPlain, IncludeInternal: internal}
 
