@@ -21,7 +21,8 @@ func init() {
 }
 
 func runExtract(cmd *cobra.Command, args []string) error {
-	c, err := changelog.Load(yamlFile)
+	cfg := loadConfig()
+	c, err := changelog.LoadWithConfig(yamlFile, cfg)
 	if err != nil {
 		return err
 	}
@@ -31,7 +32,6 @@ func runExtract(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	cfg := loadConfig()
 	internal := extractInternal || cfg.IncludeInternal
 
 	return changelog.RenderVersionMarkdown(v, os.Stdout, changelog.RenderOptions{IncludeInternal: internal})

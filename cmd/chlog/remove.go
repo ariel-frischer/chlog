@@ -40,7 +40,7 @@ func runRemove(cmd *cobra.Command, args []string) error {
 		return fmt.Errorf("entry text must not be empty")
 	}
 
-	c, err := changelog.Load(yamlFile)
+	c, err := changelog.LoadWithConfig(yamlFile, loadConfig())
 	if err != nil {
 		if os.IsNotExist(err) {
 			return fmt.Errorf("%s not found — run 'chlog init' first", yamlFile)

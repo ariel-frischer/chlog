@@ -14,22 +14,34 @@ var dateRegex = regexp.MustCompile(`^\d{4}-\d{2}-\d{2}$`)
 
 // Load reads and parses a YAML changelog from the given path.
 func Load(path string) (*Changelog, error) {
+	return LoadWithConfig(path, nil)
+}
+
+// LoadWithConfig reads a YAML changelog using cfg for category validation.
+// A nil config preserves the default validation rules.
+func LoadWithConfig(path string, cfg *Config) (*Changelog, error) {
 	f, err := os.Open(path)
 	if err != nil {
 		return nil, fmt.Errorf("opening changelog: %w", err)
 	}
 	defer func() { _ = f.Close() }()
-	return LoadFromReader(f)
+	return LoadFromReaderWithConfig(f, cfg)
 }
 
 // LoadFromReader parses a YAML changelog from a reader.
 func LoadFromReader(r io.Reader) (*Changelog, error) {
+	return LoadFromReaderWithConfig(r, nil)
+}
+
+// LoadFromReaderWithConfig parses a YAML changelog using cfg for category validation.
+// A nil config preserves the default validation rules.
+func LoadFromReaderWithConfig(r io.Reader, cfg *Config) (*Changelog, error) {
 	var c Changelog
 	dec := yaml.NewDecoder(r)
 	if err := dec.Decode(&c); err != nil {
 		return nil, fmt.Errorf("decoding YAML: %w", err)
 	}
-	if errs := Validate(&c); len(errs) > 0 {
+	if errs := Validate(&c, cfg); len(errs) > 0 {
 		msgs := make([]string, len(errs))
 		for i, e := range errs {
 			msgs[i] = e.Error()

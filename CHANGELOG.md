@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Fixed
+
+- CLI commands honor configured categories when loading CHANGELOG.yaml
+- sync and check write and compare the configured public_file instead of always CHANGELOG.md
+- README go install path is github.com/ariel-frischer/chlog/cmd/chlog@latest
+
 ## [0.3.0] - 2026-03-02
 
 ### Added

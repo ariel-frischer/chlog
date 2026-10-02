@@ -59,7 +59,7 @@ func runScaffold(cmd *cobra.Command, args []string) error {
 }
 
 func writeScaffold(v *changelog.Version) error {
-	c, err := changelog.Load(yamlFile)
+	c, err := changelog.LoadWithConfig(yamlFile, loadConfig())
 	if err != nil {
 		if os.IsNotExist(err) {
 			return fmt.Errorf("%s not found — run 'chlog init' first", yamlFile)

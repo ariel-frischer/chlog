@@ -283,7 +283,7 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
-      - run: go install github.com/ariel-frischer/chlog@latest
+      - run: go install github.com/ariel-frischer/chlog/cmd/chlog@latest
       - run: chlog validate
       - run: chlog check
 ```
@@ -295,7 +295,7 @@ Exit codes: `0` in sync, `1` out of sync, `2` validation error.
 **Go install**:
 
 ```bash
-go install github.com/ariel-frischer/chlog@latest
+go install github.com/ariel-frischer/chlog/cmd/chlog@latest
 ```
 
 **From source**:

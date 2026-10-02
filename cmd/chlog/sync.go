@@ -26,19 +26,18 @@ func init() {
 }
 
 func runSync(cmd *cobra.Command, args []string) error {
-	c, err := changelog.Load(yamlFile)
+	cfg := loadConfig()
+	c, err := changelog.LoadWithConfig(yamlFile, cfg)
 	if err != nil {
 		return err
 	}
-
-	cfg := loadConfig()
 
 	if syncSplit {
 		return runSyncSplit(c, cfg)
 	}
 
 	internal := syncInternal || cfg.IncludeInternal
-	return syncFile(c, cfg, internal, defaultMDFile)
+	return syncFile(c, cfg, internal, cfg.PublicFilePath())
 }
 
 func runSyncSplit(c *changelog.Changelog, cfg *changelog.Config) error {
