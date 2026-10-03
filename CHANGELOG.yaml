@@ -1,6 +1,8 @@
 project: chlog
 versions:
-    unreleased:
+    unreleased: {}
+    0.3.1:
+        date: 2026-10-02
         fixed:
             - CLI commands honor configured categories when loading CHANGELOG.yaml
             - sync and check write and compare the configured public_file instead of always CHANGELOG.md
