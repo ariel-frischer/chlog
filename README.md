@@ -30,7 +30,7 @@ curl -fsSL https://raw.githubusercontent.com/ariel-frischer/chlog/main/install.s
 
 - 📝 **YAML source of truth** — structured, diffable, machine-readable changelog
 - ✅ **Schema validation** — catch malformed entries before they reach CI
-- 📦 **One-command releases** — stamp version, generate Markdown, extract release notes
+- 📦 **Simple releases** — `chlog release` stamps the version, `chlog sync` regenerates Markdown, `chlog extract` pulls release notes
 - 🔀 **Public + internal entries** — separate customer-facing notes from implementation details
 - 🤖 **AI-agent ready** — ships an [Agent Skill](#ai-agent-skill) so coding agents know the schema and commands
 - 🔧 **Scaffold from commits** — auto-generate entries from conventional commits as a starting point
